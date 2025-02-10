@@ -18,18 +18,18 @@ function draw() {
 }
 
 //function twoCircles(){
-  //draw two circles, one at a fixed location
-  //and one at the same mouse location
-  //fill(0,255,0); //green fill
-  //stroke(0,0,255); //blue outline
-  //strokeWeight(5); //thickness of outline
-  //circle(200,100,50);
+//draw two circles, one at a fixed location
+//and one at the same mouse location
+//fill(0,255,0); //green fill
+//stroke(0,0,255); //blue outline
+//strokeWeight(5); //thickness of outline
+//circle(200,100,50);
 
-  //noStroke(); //turns off outlines
-  //fill(255, 0, 0,); //red fill
-  //circle(mouseX, mouseY, 30);
-  // secret calculated delay()
-  //screen updates at end of loop
+//noStroke(); //turns off outlines
+//fill(255, 0, 0,); //red fill
+//circle(mouseX, mouseY, 30);
+// secret calculated delay()
+//screen updates at end of loop
 
 //}
 
