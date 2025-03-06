@@ -38,10 +38,10 @@ function drawCharacters() {
   noStroke();
   fill(150,400,150);
   rect(boxX, boxY, 100, 100, 50, 50, 0, 0); //body part
-  rect(boxX, boxY+100, 5, 30); // left leg
-  rect(boxX+95, boxY+100, 5, 30); // right leg
+  rect(boxX, boxY+100, 5, 20); // left leg
+  rect(boxX+95, boxY+100, 5, 20); // right leg
   fill(0,0,0);
   circle(boxX +25, boxY +50, 9); // left eye
   circle(boxX +75, boxY +50, 9); // right eye
-  rect(boxX + 27, boxY + 70, 50, 3); // mouth
+  rect(boxX + 30, boxY + 70, 40, 3); // mouth
 }
