@@ -14,25 +14,80 @@ function draw() {
 
 
   //transformation one: TRANSLATION
-
+  // push(); //make a new cooordinate system on top
+  // translate(120, 120); // move coordinate system by this amount
+  // drawBasicGrid(150);
+  // rectangleRed(0, 0);
  
-
+  // pop(); // revert tp previous coordinate system
   //add push()  pop()
 
 
-
-
   //transformation two: SCALE
+  // push();
+  // rectangleRed(40,0); // 50px square
 
+  //scale: 1->no change    <1->smaller    >1->larger
+  // let scaleAmount = 2.5;
+  // scale(scaleAmount, 1);
+  // translate(60,60);
+  // drawBasicGrid(100);
+  // rectangleBlue(20, 20);
 
-
-
+  // pop();
   //transformation three: ROTATION
+  // angleMode(DEGREES);
+  // push();
+  // translate(140, 140);
+  // rotate(frameCount); // always rotate around the origin
+  // drawBasicGrid(150);
+  // face(0, 0);
+
+
+
+  // pop();// back base coordinate
+
+
+  // push();
+  // // to rotate an object around itself
+  // //1. translate to the object position
+  // //2. apply the rotation translate
+  // // 3. draw object at (0, 0)
+  // rectMode(CENTER);
+  // translate(mouseX, mouseY);
+  // scale(2);
+  // rotate(-frameCount*2);
+  // rectangleBlue(0, 0);
+  // pop();
+
+
+
+
   //reminder: rotations are measured in radians, not degrees! Functions can help with the conversion...
  
 
 
   //Combinations of Transformations
+
+  //rotating
+  let numSpoke = map(mouseX, 0, width, 1, 1000);
+  let spoke = 360/numSpoke;
+
+  angleMode(DEGREES);
+  push();
+  translate(200, 200);
+  noFill();
+  circle(0, 0, 150);
+  line(-5,0,5,0);
+  line(0,5,0,-5);
+  for (let i = 0; i < numSpoke; i++){
+    line(0, 0, 75, 0);
+    rotate(spoke);
+  }
+
+
+
+  pop();
 
   
 
