@@ -27,19 +27,16 @@ function drawRoad(){
 
 class Car{
   //1. constructor
-  constructor(x,y){
-    this.x = x;   
-    this.y = y;   
-    this.size = 20;
-    this.c = color(random(255),random(255),random(255));
+  constructor(x, y, c){
+    this.x = x;   this.y = y;   this.c = c;
+    this.speed = random(2,10);
+    this.size = 5;
   }
+
   //2. class methods
   display(){  //render the walker on screen
     rectMode(CENTER);
     fill(this.c);
-    rect(x, y, 60, 40);
-  }
-
-  move(){
+    circle(this.x, this.y, this.size);
   }
 }
