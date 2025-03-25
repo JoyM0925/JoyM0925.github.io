@@ -2,16 +2,27 @@
 // Joy Min
 // March 21, 2025
 
-let singleCar;
+let v; 
+let east = []; 
+let west = [];
 
 function setup() {
   createCanvas(800, 500);
-  singleCar = new Car(width/2, height/2, this.color);
+  for(let i = 0; i< 20; i++) {// create westward cars
+    let y = random(120,230);
+    v = new Vehicle(0, random(width), y, 0, random(2, 5));
+    west.push(v);
+    // create eastward cars
+    y = random(270,380);
+    v = new Vehicle(0, random(width), y, 0, random(2, 5));
+    east.push(v);
+  }
 }
 
 function draw() {
   background(220);
   drawRoad();
+  v.display();
 }
 
 function drawRoad(){
@@ -25,18 +36,29 @@ function drawRoad(){
   }
 }
 
-class Car{
+class Vehicle{
   //1. constructor
-  constructor(x, y, c){
-    this.x = x;   this.y = y;   this.c = c;
-    this.speed = random(2,10);
-    this.size = 5;
+  constructor(type, x, y, direction, xspeed){
+    this.x = x;   
+    this.y = y;
+    this.c = color(random(30, 255),random(30, 255),random(30, 255));
+    this.xspeed = xspeed;
+    this.d = direction;
+    this.t = type;
   }
-
   //2. class methods
-  display(){  //render the walker on screen
+  display(){  
     rectMode(CENTER);
     fill(this.c);
-    circle(this.x, this.y, this.size);
+    if (this.t === 0){
+      rect(this.x, this.y, 40, 20); // a car
+    }
+    else{
+      rect(this.x, this.y, 60, 20);// a truck
+    }
+    rectMode(CORNER);
+  }
+
+  move(){
   }
 }
