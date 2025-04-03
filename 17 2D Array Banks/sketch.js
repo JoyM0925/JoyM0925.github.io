@@ -3,12 +3,23 @@
 // April 2, 2025
 
 let grid =  
-[ [0,   60,  120, 180, 240],
-  [240, 180, 120, 60,  0],
-  [0,   200, 0,   200, 0],
+[ [0,   0,  255, 255, 0],
+  [255, 255, 0, 255,  0],
+  [0,   0,  0,   255, 0],
 ];
 
-let squareSize = 10;
+
+
+function flip(x,y){
+  if (grid[y][x] === 0) {
+    grid[y][x] === 255;
+  }
+  else{
+    grid[y][x] === 0;
+  }
+}
+
+let squareSize = 100;
 const NUMS_ROWS = 3;   const NUMS_COLS = 5;
 
 function setup() {
@@ -42,7 +53,7 @@ function mousePressed(){
   // determine current tile to a random greyscale value
   let x = getCurrentX();
   let y = getCurrentY();
-  grid[y][x] = floor(random(255));
+  grid[y][x] = floor([0, 255]);
 }
 
 function draw() {
