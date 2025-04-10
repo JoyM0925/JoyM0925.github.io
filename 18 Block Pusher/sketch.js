@@ -73,16 +73,17 @@ function draw() {
   renderBoard();
 }
 
+
+
+
 function renderBoard() {
   // interpret data in our 2D array (level), place images
   // on canvas.
   for (let x = 0; x < COLUMNS; x++) {
     for (let y = 0; y < ROWS; y++) {
-      let type = level[y][x];
+      let type = level[y][x];  //0, 1, 2, 3
       let currentImage = tiles[type];
       image(currentImage, x * TILE_SIZE, y * TILE_SIZE);
     }
   }
 }
-
-
