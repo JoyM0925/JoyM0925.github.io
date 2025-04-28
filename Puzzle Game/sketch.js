@@ -1,34 +1,29 @@
-// 2D Puzzle Game Final Version - With All Features
-// Mr. Scott starter + Completed by Joy Min
-// Features: Flip, Clicker Checker, Shift, Win, Overlay, Cross/Square toggle
+// 2D Array Puzzle Game
+// Joy Min
+// April 19, 2025
 
 let grid = [];
 let squareSize = 60;
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 
-let clickerMode = false; // 'Clicker Checker' Mode
-let squareMode = false;  // false = cross mode, true = square mode
-let hoverX = -1;
-let hoverY = -1;
+let mode = 0; // 0 = cross, 1 = 2x2 square
 
 function setup() {
   createCanvas(NUM_COLS * squareSize, NUM_ROWS * squareSize);
-  randomizeGrid();
+  randomizeGrid(); // random every time
 }
 
 function draw() {
   background(220);
   renderGrid();
-  
   if (checkWin()) {
     fill(0, 255, 0);
     textSize(32);
     textAlign(CENTER, CENTER);
     text("You Win!", width / 2, height / 2);
   }
-
-  showOverlay(hoverX, hoverY);
+  showOverlay(getCurrentX(), getCurrentY());
 }
 
 function renderGrid() {
@@ -42,16 +37,13 @@ function renderGrid() {
 }
 
 function getCurrentX() {
-  return constrain(floor(mouseX / squareSize), 0, NUM_COLS - 1);
+  let constrainedX = constrain(mouseX, 0, width - 1);
+  return floor(constrainedX / squareSize);
 }
 
 function getCurrentY() {
-  return constrain(floor(mouseY / squareSize), 0, NUM_ROWS - 1);
-}
-
-function mouseMoved() {
-  hoverX = getCurrentX();
-  hoverY = getCurrentY();
+  let constrainedY = constrain(mouseY, 0, height - 1);
+  return floor(constrainedY / squareSize);
 }
 
 function mousePressed() {
@@ -59,42 +51,32 @@ function mousePressed() {
   let y = getCurrentY();
 
   if (keyIsDown(SHIFT)) {
-    flip(x, y); // only flip center tile for Cheater Checker test
-    return false;
-  }
-
-  if (mouseButton === LEFT) {
-    if (clickerMode) {
-      flip3x3(x, y);
-    } else {
-      if (squareMode) {
-        flip3x3(x, y);
-      } else {
-        flipCross(x, y);
+    // Cheater Cheater: only flip the clicked square
+    flip(x, y);
+  } else if (mode === 1) {
+    // 2x2 square flip
+    let positions = [[x, y], [x + 1, y], [x, y + 1], [x + 1, y + 1]];
+    for (let i = 0; i < positions.length; i++) {
+      let px = positions[i][0];
+      let py = positions[i][1];
+      if (px >= 0 && px < NUM_COLS && py >= 0 && py < NUM_ROWS) {
+        flip(px, py);
       }
     }
+  } else {
+    // Cross flip
+    flip(x, y);
+    if (x > 0) flip(x - 1, y);
+    if (x < NUM_COLS - 1) flip(x + 1, y);
+    if (y > 0) flip(x, y - 1);
+    if (y < NUM_ROWS - 1) flip(x, y + 1);
   }
-
-  if (mouseButton === CENTER) {
-    shiftRowRight(y);
-  }
-
-  if (mouseButton === RIGHT) {
-    shiftColDown(x);
-  }
-
-  return false;
 }
 
 function keyPressed() {
-  if (key === 'C') {
-    clickerMode = !clickerMode;
-    console.log("Clicker Checker Mode:", clickerMode);
-  }
-
-  if (key === ' ') {
-    squareMode = !squareMode;
-    console.log("Flip Mode:", squareMode ? "Square (3x3)" : "Cross");
+  if (keyCode === 32) {
+    // space key toggles flip mode
+    mode = (mode + 1) % 2;
   }
 }
 
@@ -106,52 +88,6 @@ function flip(x, y) {
   }
 }
 
-function flipCross(x, y) {
-  flip(x, y);
-  if (x > 0) flip(x - 1, y);
-  if (x < NUM_COLS - 1) flip(x + 1, y);
-  if (y > 0) flip(x, y - 1);
-  if (y < NUM_ROWS - 1) flip(x, y + 1);
-}
-
-function flip3x3(cx, cy) {
-  for (let dx = -1; dx <= 1; dx++) {
-    for (let dy = -1; dy <= 1; dy++) {
-      let x = cx + dx;
-      let y = cy + dy;
-      if (x >= 0 && x < NUM_COLS && y >= 0 && y < NUM_ROWS) {
-        flip(x, y);
-      }
-    }
-  }
-}
-
-function shiftRowRight(row) {
-  let last = grid[row][NUM_COLS - 1];
-  for (let i = NUM_COLS - 1; i > 0; i--) {
-    grid[row][i] = grid[row][i - 1];
-  }
-  grid[row][0] = last;
-}
-
-function shiftColDown(col) {
-  let last = grid[NUM_ROWS - 1][col];
-  for (let i = NUM_ROWS - 1; i > 0; i--) {
-    grid[i][col] = grid[i - 1][col];
-  }
-  grid[0][col] = last;
-}
-
-function checkWin() {
-  let first = grid[0][0];
-  for (let y = 0; y < NUM_ROWS; y++) {
-    for (let x = 0; x < NUM_COLS; x++) {
-      if (grid[y][x] !== first) return false;
-    }
-  }
-  return true;
-}
-
 function randomizeGrid() {
   for (let y = 0; y < NUM_ROWS; y++) {
     grid[y] = [];
@@ -161,27 +97,43 @@ function randomizeGrid() {
   }
 }
 
+function checkWin() {
+  let first = grid[0][0];
+  for (let y = 0; y < NUM_ROWS; y++) {
+    for (let x = 0; x < NUM_COLS; x++) {
+      if (grid[y][x] !== first) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 function showOverlay(cx, cy) {
-  if (cx < 0 || cy < 0 || cx >= NUM_COLS || cy >= NUM_ROWS) return;
-
   noStroke();
-  fill(0, 255, 0, 100); // semi-transparent green
+  fill(0, 255, 0, 100);
 
-  if (squareMode || clickerMode) {
-    // Square (3x3)
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        let x = cx + dx;
-        let y = cy + dy;
-        if (x >= 0 && x < NUM_COLS && y >= 0 && y < NUM_ROWS) {
-          square(x * squareSize, y * squareSize, squareSize);
-        }
+  if (keyIsDown(SHIFT)) {
+    // Preview for Cheater mode
+    if (cx >= 0 && cx < NUM_COLS && cy >= 0 && cy < NUM_ROWS) {
+      square(cx * squareSize, cy * squareSize, squareSize);
+    }
+  } else if (mode === 1) {
+    // 2x2 square overlay
+    let positions = [[cx, cy], [cx + 1, cy], [cx, cy + 1], [cx + 1, cy + 1]];
+    for (let i = 0; i < positions.length; i++) {
+      let x = positions[i][0];
+      let y = positions[i][1];
+      if (x >= 0 && x < NUM_COLS && y >= 0 && y < NUM_ROWS) {
+        square(x * squareSize, y * squareSize, squareSize);
       }
     }
   } else {
-    // Cross
-    let coords = [[cx, cy], [cx - 1, cy], [cx + 1, cy], [cx, cy - 1], [cx, cy + 1]];
-    for (let [x, y] of coords) {
+    // Cross overlay
+    let positions = [[cx, cy], [cx - 1, cy], [cx + 1, cy], [cx, cy - 1], [cx, cy + 1]];
+    for (let i = 0; i < positions.length; i++) {
+      let x = positions[i][0];
+      let y = positions[i][1];
       if (x >= 0 && x < NUM_COLS && y >= 0 && y < NUM_ROWS) {
         square(x * squareSize, y * squareSize, squareSize);
       }
