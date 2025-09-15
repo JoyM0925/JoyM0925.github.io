@@ -67,7 +67,7 @@ function mouseReport(){
   // inspect some of the built - int(system variables)
   // for working with the mouse
   fill(0);
-  let src = mouseX + "," + mouseY + " ," + mouseIsPressed+ "+" mouseButton;
+  let src = mouseX + "," + mouseY + " ," + mouseIsPressed+ "+" + mouseButton;
   textSize(tSize);
   text(src, mouseX, mouseY)
   if(mouseIsPressed){
