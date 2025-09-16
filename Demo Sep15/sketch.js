@@ -7,6 +7,8 @@
 let x = 200;
 let y = 200;
 let h = 100;
+let w = 8;
+let l = 30;
 
 function setup() {
   createCanvas(400, 400);
@@ -16,6 +18,7 @@ function draw() {
   background(0);
   alien();
   movement();
+  largerorsmaller();
 }
 // function alien(){
 //   //head
@@ -34,17 +37,18 @@ function draw() {
 // }
 
 function alien(){
+  rectMode(CENTER);
   fill(255, 204, 229); 
   circle(x, y, h);
   noStroke();
-  rect(x-50, y,h, h/2);
+  rect(x, y+h/4,h, h/2);
   fill(255, 204, 229);
-  rect(x-50,y+h/2, 8, 30);
-  rect(x+42,y+h/2, 8, 30);
+  rect(x-46,y+h/2, w, l);
+  rect(x+46,y+h/2, w, l);
   fill(255, 102, 178 );
   circle(x-30, y, 10);
-  circle(x+20, y, 10);
-  rect(x-20, y+20, 40, 3);
+  circle(x+30, y, 10);
+  rect(x, y+20, 40, 3);
 }
 
 function movement(){
@@ -77,4 +81,20 @@ function movement(){
     y = height;
   }
 
+}
+
+function largerorsmaller(){
+  if (keyIsDown(65)){
+    h += 10;
+    w+=10;
+    l+=10;
+  }
+  if (key === "t"){
+    h=100;
+  }
+  if (keyIsDown(66) && h>100 && w>8 && l>30){
+    h -= 10;
+    w-=10;
+    l-=10;
+  }
 }
