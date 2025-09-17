@@ -1,26 +1,31 @@
-// Interactive Scene
+//Interactive Scene
 // Joy Min
 // Sep 16
 
 let c1x = 100; // first cloud's x position
 let c1y = 100; // first cloud's y position
-
 let c2x = 400; // second cloud's x position
 let c2y = 130; // second cloud's y position
-
+let x = 600;// x position for ship
+let y = 550;// y position for ship
+let currentBack = 0;
+let reset = false; 
 
 function setup() {
   createCanvas(800, 600);
 }
 
 function draw() {
-  background(153, 204, 255);
-  mountain()
-  river()
-  cloud()
-  moveofcloud()
-}
+  x = mouseX;
+  changeBackground();
+  mountain();
+  river();
+  cloud();
+  moveofcloud();
+  ship();
+  mysignature();
 
+}
 function cloud(){
   // first cloud
   noStroke();
@@ -44,19 +49,47 @@ function cloud(){
 }
 
 function moveofcloud(){
-  if (keyIsDown(65)){//a is pressed
+  if (keyIsDown(65)){//a is pressed, move cloud 1 to the left
     c1x -=10;
   }
-  if (keyIsDown(68)){//a is pressed
+  if (keyIsDown(68)){//d is pressed, move cloud 1 to the right
     c1x +=10;
   }
+  if (keyIsDown(90)){//z is pressed, move cloud 2 to the left
+    c2x -=10;
+  }
+  if (keyIsDown(67)){//c is pressed, move cloud 12to the right
+    c2x +=10;
+  }
+  //make sure that the clouds can't run out of boudries.
+  if (c1x <0){
+    c1x = 800;
+  }
+  if (c1x >800){
+    c1x = 0
+  }
+  if (c2x <0){
+    c2x = 800;
+  }
+  if (c2x >800){
+    c2x = 0
+  }
+  // reset position
+  if (reset){ 
+    c1x = 100; 
+    c1y = 100; 
+    c2x = 400; 
+    c2y = 130;
+    x=600; 
+  }
+  
 }
 
 function river(){
   fill(102, 178, 255);
   stroke(0, 128, 255);
   rect(0,450, 800, 200);//river
-  
+
 }
 
 function mountain(){
@@ -78,3 +111,64 @@ function mountain(){
   
 }
 
+function ship(){
+  fill(145, 213, 251);
+  stroke(22, 173, 251);
+  quad(x-90, y-80, x+180, y-80, x+110, y+20, x-20, y+20); // body of the ship
+  fill(145, 213, 251);
+  rect(x+50,y-180,3, 100); // flag
+  fill(254, 213, 251);
+  triangle(x+50, y-150, x+0,y-150,x+50, y-180);
+  fill(2, 156, 251) // decoration on ship
+  circle(x+10, y-30, 50);
+  fill(116, 225, 251);
+  circle(x+10, y-30, 30);
+  fill(2, 156, 251)
+  circle(x+80, y-30, 50);
+  fill(116, 225, 251);
+  circle(x+80, y-30, 30);
+}
+
+function mysignature() {
+  fill(255);
+  textSize(20);
+  text("Joy M", 20, height - 20);
+}
+
+
+function changeBackground() {
+
+
+  // if current back = 0, background as normal
+  if (currentBack === 0) {
+    background(153, 204, 255);
+  }
+  // if background is not = 0, use other color
+  else if (currentBack === 1) {
+    background(50, 50, 150);
+  } // blue
+  else if (currentBack === 2) {
+    background(100, 50, 100);
+  } // violet
+  else if (currentBack === 3) {
+    background(100, 50, 50);
+  }// orange
+
+}
+
+
+function keyPressed() {
+  // press r to reset background color
+  if (key === 'r') {
+    reset = !reset;
+    currentBack = 0; // reset background color
+  }
+  // every time press up arrow, background color change
+  else if(keyCode === UP_ARROW){
+    currentBack = currentBack + 1; // 0 → 1 → 2 → 3 → 0
+    if (currentBack >= 4 ){// start over again
+      currentBack = -1;
+      currentBack = currentBack + 1; 
+    }
+  }
+} 
