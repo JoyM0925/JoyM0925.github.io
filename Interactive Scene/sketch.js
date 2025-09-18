@@ -1,4 +1,4 @@
-//Interactive Scene
+// Interactive Scene
 // Joy Min
 // Sep 16
 
@@ -61,7 +61,7 @@ function moveofcloud(){
   if (keyIsDown(67)){//c is pressed, move cloud 12to the right
     c2x +=10;
   }
-  //make sure that the clouds can't run out of boudries.
+  //make sure that the clouds can't run out of window
   if (c1x <0){
     c1x = 800;
   }
