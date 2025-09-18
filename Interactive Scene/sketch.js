@@ -24,6 +24,7 @@ function draw() {
   moveofcloud();
   ship();
   mysignature();
+  
 
 }
 function cloud(){
@@ -146,15 +147,29 @@ function changeBackground() {
   // if background is not = 0, use other color
   else if (currentBack === 1) {
     background(50, 50, 150);
+    for(let i = 0; i<20; i++){ //rainy
+      let x = random(width*0.01, width);
+      let y = random(height*0.01, height);
+      line(x-70, y-200, x-70, y+25-200)
+    }
   } // blue
   else if (currentBack === 2) {
     background(100, 50, 100);
+    for(let i = 0; i<20; i++){
+      let x = random(width*0.01, width);
+      let y = random(height*0.01, height);
+      stroke (255, 0, 0)
+      line(x-70, y-200, x-30, y+40-200)
+    }
   } // violet
   else if (currentBack === 3) {
     background(100, 50, 50);
+    fill(255, 255, 102);
+    stroke(255, 255, 102)
+    circle(width, 0, 150); // sun
   }// orange
 
-}
+  }
 
 
 function keyPressed() {
