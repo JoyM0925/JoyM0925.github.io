@@ -18,7 +18,9 @@ function setup() {
 function generateTerrain(){
   let rectcount = windowWidth / rectWidth; // number of rects
   let noisevalue = noisestart;
-  let highestpeak = 0; 
+  let highestpeak = Infinity; 
+  let highestX;
+  let highestY;
   let sumheight = 0; // total height for calc averg height
 
 
@@ -28,19 +30,16 @@ function generateTerrain(){
   rectMode(CORNERS);
 
   for(let i = 0; i<rectcount; i++){
-    //generate a random height. 
-    //change this from using random() to noise()
+    //generate random heights
     stroke(255, 153, 153)
     fill(255, 204, 204)
     let x = i*rectWidth
-    let heightvalue = noise(noisevalue)
     noisevalue += noisespeed
-    let rectheight = map(heightvalue, 0, 1, minheight, maxheight); 
-    sumheight += rectheight; // add total height for averaging after every loop
+    let rectheight = map(noise(noisevalue), 0, 1, minheight, maxheight); 
     let x2 = x + rectWidth;
     let y2 = height - rectheight;
     rect(x, height, x2, y2);
-    
+    sumheight += rectheight; // add total height for averaging after every loop
   }
   
   rectMode(CORNER);
@@ -48,6 +47,13 @@ function generateTerrain(){
 }
 
 function draw() {
-  // background(220);
+  background(255);
   generateTerrain();
+  if (keyCode === LEFT_ARROW && keyIsDown){
+    rectWidth = rectWidth - adjustwith;
+  }
+  if (keyCode === RIGHT_ARROW && keyIsDown){
+    rectWidth = rectWidth + adjustwith;
+  }
+  noisestart += 0.01;
 }
