@@ -7,11 +7,14 @@ let rectWidth = 10;
 let adjustwith = 0.5; // value to ajust rectangle width
 let noisestart = 0; 
 let noisespeed = 0.02; 
+
+// max and min height for generating
 let minheight = 20 
 let maxheight = 500;
-let avgHeight = 0;
-let highestX;
-let highestY;
+
+let avgHeight = 0; 
+let highestX; // the x position for the highest peak
+let highestY; // y position for the highest peak
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -23,6 +26,8 @@ function generateTerrain(){
   let sumheight = 0; // total height for calc averg height
   
   let highestpeak = 0; 
+
+  
 
   // use a loop to generate and draw
   // several rectangles side to side
@@ -39,6 +44,7 @@ function generateTerrain(){
     let x2 = x + rectWidth;
     let y2 = height - rectheight;
     rect(x, height, x2, y2);
+    sumheight += rectheight; // add total height for averaging after every loop
 
     if (rectheight > highestpeak) { // find highest peak
       highestpeak = rectheight;
@@ -46,9 +52,6 @@ function generateTerrain(){
       highestY = y2; 
 
     }
-
-     
-    sumheight += rectheight; // add total height for averaging after every loop
   }
   
   rectMode(CORNER);
@@ -72,18 +75,17 @@ function draw() {
 
 
 function drawFlag(x, y) {
+  // Flag on the highest peak
   stroke(255, 105, 190);
-  strokeWeight(3);
   line(x, y, x, y - 30);
   fill(255, 182, 180);
   noStroke();
   triangle(x, y - 30, x + 15, y - 20, x, y - 10);
-
-
 }
 
 
 function average(){
+  // average band that calculate from sumheight 
   fill(255, 105, 200, 100); 
   noStroke();
   rect(0, height - avgHeight - 10, width, 10);
