@@ -61,7 +61,7 @@ function generateTerrain(){
 function draw() {
   background(255);
   generateTerrain();
-  average();
+  average(); // average band
   drawFlag(highestX, highestY); // flag find the highest peak
   if (keyIsDown(LEFT_ARROW) && rectWidth >=3) {
     rectWidth = rectWidth - adjustwith; // decrease the rectwidth by left arrow button
