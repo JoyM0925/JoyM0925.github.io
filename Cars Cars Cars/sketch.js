@@ -1,7 +1,8 @@
 // Cars Cars Cars
 // Joy Min
 // Oct 20, 2025
-let myV;
+
+// GLOBAL
 let eastbound = []; // to hold all our cars in eastbound
 let westbound = []; // to hold all our cars in westbound
 
@@ -19,17 +20,12 @@ function setup() {
 
 function draw() {
   drawRoad();
-  // every car runs towards east runs its action
-  for (let i = 0; i < eastbound.length; i++) {
-    eastbound[i].action();
+  for (let w of westbound){
+    w.action();
   }
-  
-
-  // every car runs towards west runs its action
-  for (let i = 0; i < westbound.length; i++) {
-    westbound[i].action();
+  for (let e of eastbound){
+    e.action();
   }
-
 }
 
 function drawRoad() {
@@ -44,6 +40,36 @@ function drawRoad() {
     rect(i, 500 / 2, 30, 5);
   }
 
+}
+
+function mousePressed(){
+  if (mouseButton === LEFT) {
+    if (keyCode === SHIFT) {
+      // SHIFT + LEFT
+      let type = int(random(2));
+      let newV = new vehicles(type, mouseX, random(120, 200), 0, random(-5, -2));
+      westbound.push(newV);
+    } 
+    else {
+      // NORMAL LEFT
+      let type = int(random(2));
+      let newV2 = new vehicles(type, mouseX, random(280, 370), 1, random(2, 5));
+      eastbound.push(newV2);
+    }
+  }
+}
+
+class TrafficLight{
+  constructor( x, y, l){
+    this.x = x;
+    this.y = y;
+    this.l = l;
+  }
+
+  display(){
+    this
+    circle(this.x, this.y, this.l);
+  }
 }
 
 class vehicles{
