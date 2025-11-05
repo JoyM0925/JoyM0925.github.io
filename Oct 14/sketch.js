@@ -1,5 +1,5 @@
 // Objects Mini Demo
-// Mr. Scott
+// Joy Min
 // October 10, 2025
 
 // Globals ----- "simple data only"
