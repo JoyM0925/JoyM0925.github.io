@@ -8,9 +8,9 @@
 
 let grid = [];
 
-let rows = 4; // y
+let rows = 5; // y
 let cols = 5; // x
-
+let mode = 0;
 let squareSize = 100;
 
 function setup() { 
@@ -47,8 +47,21 @@ function mousePressed(){
   let x = getCurrentX();
   let y = getCurrentY();
 
-  // ALWAYS: flip the "focus tile"
-  flip(x, y);
+  if (keyIsDown(SHIFT)){
+    flip(x,y)
+  }
+  else{
+    if (mode%2 !== 2){
+      crossflip(x,y)
+    }
+    squareFlip(x,y)
+  }
+}
+
+function spacePressed(){
+  if (keyCode === 32){
+    mode++;
+  }
 }
 
 function getCurrentX(){
@@ -73,6 +86,22 @@ function flip(x, y){
   }
 }
 
+function crossflip(x, y){
+  //IF THEY EXIST:
+  //flip our NSEW neighbours (cross pattern)
+  flip(x, y)
+  if(x+1 < cols) flip(x+1,y);
+  if(y-1 >= 0) flip(x, y-1);
+  if(x-1 < cols) flip(x-1,y);
+  if(y+1 >= 0) flip(x, y+1);
+}
+
+function squareFlip(x,y){ 
+  flip(x, y)
+  if(x+1 < cols) flip(x+1,y);
+  if(y-1 >= 0) flip(x, y-1);
+  flip(x+1, y-1)
+}
 
 function checkWiWHite() {
   let colorW = 255;
@@ -111,6 +140,8 @@ function randomGrid(){
     }
   }
 }
+
+
 
 // let grid = [
   
