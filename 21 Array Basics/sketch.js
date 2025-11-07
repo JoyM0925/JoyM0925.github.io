@@ -41,6 +41,12 @@ function renderGrid(){
   }
 }
 
+function keyPressed(){
+  if (key === " "){
+    mode++;
+  }
+}
+
 function mousePressed(){
   // Flip the current tile 
   // Only do this if the mouse is on canvas 
@@ -51,16 +57,12 @@ function mousePressed(){
     flip(x,y)
   }
   else{
-    if (mode%2 !== 2){
-      crossflip(x,y)
+    if (mode%2 == 1){
+      squareFlip(x,y)
     }
-    squareFlip(x,y)
-  }
-}
-
-function spacePressed(){
-  if (keyCode === 32){
-    mode++;
+    else{
+      crossflip(x,y);
+    }
   }
 }
 
