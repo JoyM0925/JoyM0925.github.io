@@ -34,10 +34,24 @@ function draw() {
   loadPixels();
 
   // runs a filter to modify the pixel array
-
-  greyscale()
-  updatePixels();
+  // boost();
+  // greyscale();
+  background(0);
+  textImage();
+  // updatePixels();
   // circle(mouseX, mouseY, 20)
+}
+
+function textImage(){
+  // render an image using characters
+  fill(255);
+  for (let x = 0; x < width; x+=20){
+    for(let y = 0; y< height; y+=10){
+      let avg = getAvg(x, y);
+      if(avg > 200)   text("%", x, y);
+      else if (avg > 100)   text
+    }
+  }
 }
 
 function getAvg(x, y){
@@ -59,7 +73,7 @@ function greyscale(){
   }
 }
 
-function boots(){
+function boost(){
   // brightening filter
   let boost = map(mouseX, 0, width, -100, 100);
   for (let i = 0; i < pixels.length; i +=4){
