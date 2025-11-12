@@ -9,7 +9,7 @@
 let grid = [];
 
 let rows = 10; // y
-let cols = 10; // x
+let cols = 10    ; // x
 let mode = 0; // store a variable called mode, if it is odd number then square flip, even -> cross flip; it starts with 0 -> cross number
 let squareSize = 100;
 
