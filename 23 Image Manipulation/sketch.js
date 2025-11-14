@@ -3,7 +3,8 @@
 // Nov 12, 2025
 
 let pilot
-
+let scaleAmount = 5;
+let started = false;
 function setup() {
   createCanvas(891, 892);
   loadAssets();
@@ -11,7 +12,8 @@ function setup() {
 }
 
 async function loadAssets() {
-  pilot = await loadImage("assets/aviator.png")
+  pilot = await createVideo("assets/bball.mp4");
+  pilot.hide();
 }
 
 function setPixelOneD(pos, r, g, b){
@@ -22,6 +24,12 @@ function setPixelOneD(pos, r, g, b){
   pixels[pos + 2] = b;
 }
 
+function mousePressed(){
+  started = true;
+  resizeCanvas(pilot.width, pilot.height, false);
+  pilot.loop();
+}
+
 function setPixel(x, y, r, g, b){
   // x, y -> pixel location
   // r, g b -> new pixel color
@@ -30,26 +38,42 @@ function setPixel(x, y, r, g, b){
 }
 
 function draw() {
-  image(pilot, 0,0)
-  loadPixels();
+  if (started){
+    image(pilot, 0,0)
+    loadPixels();
+    background(0);
+    textImage();
+  }
 
   // runs a filter to modify the pixel array
   // boost();
   // greyscale();
-  background(0);
-  textImage();
   // updatePixels();
   // circle(mouseX, mouseY, 20)
 }
 
+// function arrow(){
+//   if (keyIsPressed === LEFT_ARROW && scaleAmount > 0){
+//     scaleAmount --;
+//   }
+//   if (keyIsPressed === RIGHT_ARROW){
+//     scaleAmount ++;
+//   }
+// }
+
 function textImage(){
   // render an image using characters
   fill(255);
-  for (let x = 0; x < width; x+=20){
-    for(let y = 0; y< height; y+=10){
+  text(scaleAmount)
+  for (let x = 0; x < width; x+=scaleAmount){
+    for(let y = 0; y< height; y+=scaleAmount){
       let avg = getAvg(x, y);
-      if(avg > 200)   text("%", x, y);
-      else if (avg > 100)   text
+      if(avg > 220)         text("&", x, y);
+      else if (avg > 180)   text("O", x, y);
+      else if (avg > 140)   text("/", x, y);
+      else if (avg > 100)   text("=", x, y);
+      else if (avg > 60)    text(",", x, y);
+      else if (avg > 40)    text(".", x, y);
     }
   }
 }

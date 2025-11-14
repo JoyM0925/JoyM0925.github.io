@@ -119,7 +119,7 @@ function overlayOfFlip(x,y){
 function crossflip(x, y){
   //IF THEY EXIST:
   //flip our NSEW neighbours (cross pattern)
-  flip(x, y)
+  flip(x, y);
   if(x+1 < cols) flip(x+1,y);
   if(y-1 >= 0) flip(x, y-1);
   if(x-1 < cols) flip(x-1,y);
