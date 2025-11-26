@@ -194,15 +194,78 @@
 // }
 
 
-//THIRD IMAGE --------------------- NUIT
+
+
+
+
+
+
+
+
+
+// //FORTH IMAGE --------------------- HAND
+
+// let myImage;
+
+// async function setup() {
+  
+//   pixelDensity(1);
+//   myImage = await loadImage("assets/hand.jpg");
+//   createCanvas(600, 600);
+// }
+
+// // For each pixel, remove the red component (set to 0)
+// //                 halve the blue component
+// // R G B A R G B A
+
+
+// function colorEffect() {
+//   for (let x = width / 2; x < width; x++){
+//     for (let y = 0; y < height; y++){
+//       // right side x pixel location
+//       let rightIndex = (y * width + x) * 4;
+//       // find the mirror x location on the left side
+//       let mirrorX = width - x;
+//       let leftIndex = (y * width + mirrorX) * 4;
+
+//       // copy the rgb from right to left
+//       pixels[leftIndex] = pixels[rightIndex]; // R
+//       pixels[leftIndex + 1] = pixels[rightIndex + 1]; // G
+//       pixels[leftIndex + 2] = pixels[rightIndex + 2]; // B
+//     }
+//   }
+// }
+
+// function draw() {
+//   background(220);
+//   image(myImage,0,0);
+//   loadPixels(); //populate the pixels array
+
+//     colorEffect(); //replace w/ each different exercise
+
+//   updatePixels();  //redraw based on our changes
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+//FIFTH IMAGE --------------------- BUTTERFLY
 
 let myImage;
 
 async function setup() {
   
   pixelDensity(1);
-  //myImage = await loadImage("assets/nuit.jpg");
-  myImage = await loadImage("assets/hand.jpg");
+  myImage = await loadImage("assets/butterfly.jpg");
   createCanvas(600, 600);
 }
 
@@ -210,20 +273,46 @@ async function setup() {
 //                 halve the blue component
 // R G B A R G B A
 
+function indexAt(x, y) {
+  return (y * width + x) * 4;
+}
 
 function colorEffect() {
-  for (let x = width / 2; x < width; x++){
-    for (let y = 0; y < height; y++){
-      // right side x pixel location
-      let rightIndex = (y * width + x) * 4;
-      // find the mirror x location on the left side
-      let mirrorX = width - x;
-      let leftIndex = (y * width + mirrorX) * 4;
+  let midX = width/2;
+  let midY = height/2;
 
-      // copy the rgb from right to left
-      pixels[leftIndex] = pixels[rightIndex]; // R
-      pixels[leftIndex + 1] = pixels[rightIndex + 1]; // G
-      pixels[leftIndex + 2] = pixels[rightIndex + 2]; // B
+  // make an new copy of image called original so that we can use indexAt(x,y) to copy the certain area of the original im
+
+  // loop over only the top-left quadrant (Q1)
+  for (let x = 0; x < midX; x++) {
+    for (let y = 0; y < midY; y++) {
+
+      // indices of the four quadrants in the ORIGINAL image
+      let iQ1 = indexAt(x, y); // top-left
+      let iQ2 = indexAt(x + midX, y); // top-right
+      let iQ3 = indexAt(x, y + midY); // bottom-left
+      let iQ4 = indexAt(x + midX, y + midY); // bottom-right
+
+      // CLOCKWISE rotation using the original backup:
+      // Q3 -> Q1
+      pixels[iQ1] = original[iQ3];
+      pixels[iQ1 + 1] = original[iQ3 + 1];
+      pixels[iQ1 + 2] = original[iQ3 + 2];
+
+      // Q1 -> Q2
+      pixels[iQ2] = original[iQ1];
+      pixels[iQ2 + 1] = original[iQ1 + 1];
+      pixels[iQ2 + 2] = original[iQ1 + 2];
+
+      // Q2 -> Q4
+      pixels[iQ4] = original[iQ2];
+      pixels[iQ4 + 1] = original[iQ2 + 1];
+      pixels[iQ4 + 2] = original[iQ2 + 2];
+
+      // Q4 -> Q3
+      pixels[iQ3] = original[iQ4];
+      pixels[iQ3 + 1] = original[iQ4 + 1];
+      pixels[iQ3 + 2] = original[iQ4 + 2];
     }
   }
 }
