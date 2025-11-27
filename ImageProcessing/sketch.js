@@ -258,6 +258,63 @@
 
 
 
+// //FIFTH IMAGE --------------------- BUTTERFLY
+
+// let myImage;
+
+// async function setup() {
+  
+//   pixelDensity(1);
+//   myImage = await loadImage("assets/butterfly.jpg");
+//   createCanvas(600, 600);
+// }
+
+// // For each pixel, remove the red component (set to 0)
+// //                 halve the blue component
+// // R G B A R G B A
+
+
+
+// function colorEffect() {
+//   // use the 2 midlines ( x and y) to define the 4 quadrants
+//   let midX = width/2;
+//   let midY = height/2;
+
+//   // cut the four quadrants from the original image
+//   let Q1 = myImage.get(0, 0, midX, midY); // top-left
+//   let Q2 = myImage.get(midX, 0,midX, midY); // top-right
+//   let Q3 = myImage.get(0, midY, midX, midY); // bottom-left
+//   let Q4 = myImage.get(midX, midY, midX, midY); // bottom-right
+
+//   // Q3 - Q1
+//   image(Q3, 0, 0, midX, midY);
+
+//   // Q1 - Q2
+//   image(Q1, midX, 0, midX, midY);
+
+//   // Q2 - Q4
+//   image(Q2, midX, midY, midX, midY);
+
+//   // Q4 - Q3
+//   image(Q4, 0, midY, midX, midY);
+// }
+
+// function draw() {
+//   background(220);
+//   image(myImage,0,0);
+//   // loadPixels(); //populate the pixels array
+
+//     colorEffect(); //replace w/ each different exercise
+
+//   // updatePixels();  //redraw based on our changes
+// }
+
+
+
+
+
+
+
 //FIFTH IMAGE --------------------- BUTTERFLY
 
 let myImage;
@@ -265,7 +322,7 @@ let myImage;
 async function setup() {
   
   pixelDensity(1);
-  myImage = await loadImage("assets/butterfly.jpg");
+  myImage = await loadImage("assets/nuit.jpg");
   createCanvas(600, 600);
 }
 
@@ -273,57 +330,87 @@ async function setup() {
 //                 halve the blue component
 // R G B A R G B A
 
-function indexAt(x, y) {
-  return (y *width + x)* 4; // return a certurn area of image ( i just find it feels like the function get() and i did even more complexed)
-}
 
-function colorEffect() {
-  // use the 2 midlines ( x and y) to define the 4 quadrants
-  let midX = width/2;
-  let midY = height/2;
 
-  // make an new copy of image called original so that we can use indexAt(x,y) to copy the certain area of the original im
-  let original = structuredClone(pixels)
+function colorEffect(radius){
+  let original = structuredClone(pixels);// make a copy of the original pic
 
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
 
-      // indices of the four quadrants in the original image
-      let Q1 = indexAt(x, y); // top-left
-      let Q2 = indexAt(x + midX, y); // top-right
-      let Q3 = indexAt(x, y + midY); // bottom-left
-      let Q4 = indexAt(x + midX, y + midY); // bottom-right
+      let sumR = 0;
+      let sumG = 0;
+      let sumB = 0;
+      let count = 0;
 
-      // using the original backup to copy the 4 quadrants
-      // Q2 -> Q1
-      pixels[Q1] = original[Q2];
-      pixels[Q1 + 1] = original[Q2 + 1];
-      pixels[Q1 + 2] = original[Q2 + 2];
+      // center
+      let i = (y * width + x) * 4;
+      sumR += original[i];
+      sumG += original[i + 1];
+      sumB += original[i + 2];
+      count++;
 
-      // Q3 -> Q2
-      pixels[Q2] = original[Q4];
-      pixels[Q2 + 1] = original[Q4 + 1];
-      pixels[Q2 + 2] = original[Q4 + 2];
+      // top left 
+      let x1 = x - radius;
+      let y1 = y - radius;
+      if (x1 >= 0 && y1 >= 0) {
+        let j = (y1 * width + x1) * 4;
+        sumR += original[j];
+        sumG += original[j + 1];
+        sumB += original[j + 2];
+        count++;
+      }
 
-      // Q1 -> Q4
-      pixels[Q4] = original[Q1];
-      pixels[Q4 + 1] = original[Q1 + 1];
-      pixels[Q4 + 2] = original[Q1 + 2];
+      // top right
+      let x2 = x + radius;
+      let y2 = y - radius;
+      if (x2 < width && y2 >= 0) {
+        let j = (y2 * width + x2) * 4;
+        sumR += original[j];
+        sumG += original[j + 1];
+        sumB += original[j + 2];
+        count++;
+      }
 
-      // Q4 -> Q3
-      pixels[Q3] = original[Q4];
-      pixels[Q3 + 1] = original[Q4 + 1];
-      pixels[Q3 + 2] = original[Q4 + 2];
+      // down left
+      let x3 = x - radius;
+      let y3 = y + radius;
+      if (x3 >= 0 && y3 < height) {
+        let j = (y3 * width + x3) * 4;
+        sumR += original[j];
+        sumG += original[j + 1];
+        sumB += original[j + 2];
+        count++;
+      }
+
+      // down rigfht
+      let x4 = x + radius;
+      let y4 = y + radius;
+      if (x4 < width && y4 < height) {
+        let j = (y4 * width + x4) * 4;
+        sumR += original[j];
+        sumG += original[j + 1];
+        sumB += original[j + 2];
+        count++;
+      }
+
+      // get zhe avg of the pixel and update
+      pixels[i]     = sumR/count;
+      pixels[i + 1] = sumG/count;
+      pixels[i + 2] = sumB/count;
     }
   }
 }
+
+  
+     
 
 function draw() {
   background(220);
   image(myImage,0,0);
   loadPixels(); //populate the pixels array
 
-    colorEffect(); //replace w/ each different exercise
+    colorEffect(20); //replace w/ each different exercise
 
   updatePixels();  //redraw based on our changes
 }
