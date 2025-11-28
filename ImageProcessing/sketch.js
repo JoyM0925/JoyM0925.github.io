@@ -315,7 +315,7 @@
 
 
 
-//FIFTH IMAGE --------------------- BUTTERFLY
+//Sixth IMAGE --------------------- Nuit blur ver 
 
 let myImage;
 
@@ -338,6 +338,7 @@ function colorEffect(radius){
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
 
+
       let sumR = 0;
       let sumG = 0;
       let sumB = 0;
@@ -350,52 +351,68 @@ function colorEffect(radius){
       sumB += original[i + 2];
       count++;
 
+
       // top left 
-      let x1 = x - radius;
-      let y1 = y - radius;
-      if (x1 >= 0 && y1 >= 0) {
+      
+      for (let d = -radius; d <= radius; d++){
+        let x1 = x + d;
+        let y1 = y + d;
         let j = (y1 * width + x1) * 4;
-        sumR += original[j];
-        sumG += original[j + 1];
-        sumB += original[j + 2];
-        count++;
+        if (x1 >= 0 && y1 >= 0) {
+          let j = (y1 * width + x1) * 4;
+          sumR += original[j];
+          sumG += original[j + 1];
+          sumB += original[j + 2];
+          count++;
+        }
       }
 
+
+
       // top right
-      let x2 = x + radius;
-      let y2 = y - radius;
-      if (x2 < width && y2 >= 0) {
-        let j = (y2 * width + x2) * 4;
-        sumR += original[j];
-        sumG += original[j + 1];
-        sumB += original[j + 2];
-        count++;
+  
+      for (let d = -radius; d <= radius; d++){
+        let x2 = x - d;
+        let y2 = y + d;
+        if (x2 < width && y2 >= 0) {
+          let j = (y2 * width + x2) * 4;
+          sumR += original[j];
+          sumG += original[j + 1];
+          sumB += original[j + 2];
+          count++;
+        }
       }
 
       // down left
-      let x3 = x - radius;
-      let y3 = y + radius;
-      if (x3 >= 0 && y3 < height) {
-        let j = (y3 * width + x3) * 4;
-        sumR += original[j];
-        sumG += original[j + 1];
-        sumB += original[j + 2];
-        count++;
+    
+      for (let d = -radius; d <= radius; d++){
+        let x3 = x + d;
+        let y3 = y - d;
+        if (x3 >= 0 && y3 < height) {
+          let j = (y3 * width + x3) * 4;
+          sumR += original[j];
+          sumG += original[j + 1];
+          sumB += original[j + 2];
+          count++;
+        }
       }
 
       // down rigfht
-      let x4 = x + radius;
-      let y4 = y + radius;
-      if (x4 < width && y4 < height) {
-        let j = (y4 * width + x4) * 4;
-        sumR += original[j];
-        sumG += original[j + 1];
-        sumB += original[j + 2];
-        count++;
+    
+      for (let d = -radius; d <= radius; d++){
+        let x4 = x - d;
+        let y4 = y - d;
+        if (x4 < width && y4 < height) {
+          let j = (y4 * width + x4) * 4;
+          sumR += original[j];
+          sumG += original[j + 1];
+          sumB += original[j + 2];
+          count++;
+        }
       }
 
       // get zhe avg of the pixel and update
-      pixels[i]     = sumR/count;
+      pixels[i] = sumR/count;
       pixels[i + 1] = sumG/count;
       pixels[i + 2] = sumB/count;
     }
