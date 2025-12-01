@@ -24,7 +24,6 @@
 //     let r = pixels[i]; // R
 //     let g = pixels[i + 1]; // G
 //     let b = pixels[i + 2]; // B
-//                            // Nothing for A
 //
 //     // Determine which RGB value is the greatest.
 //     if (r >= g && r >= b){
@@ -90,8 +89,7 @@
 
 //       // Check if the pixel is on the right half of the screen
 //       if (x > width / 2){
-//         // Set the green component to 0
-//         pixels[index + 1] = 0;  // G = 0
+//         pixels[index + 1] = 0;  // set g = 0
 //       }
 //     }
 //   }
@@ -129,22 +127,22 @@
 // //                 halve the blue component
 // // R G B A R G B A
 
-// function setPixelOneD(pos, r, g, b) {
-//   // pos → 1D location in pixels array (red component)
-//   // r,g,b → new colors for that pixel
+// function setPixelOneD(pos, r, g, b) { // copied from github the previous work
+//   // pos -> 1D location in pixels array (red component)
+//   // r,g,b -> new colors for that pixel
 //   pixels[pos] = r;
 //   pixels[pos + 1] = g;
 //   pixels[pos + 2] = b;
 // }
 
-// function setPixel(x, y, r, g, b) {
-//   //x,y → pixel location
-//   //r,g,b → new pixel color
+// function setPixel(x, y, r, g, b) { // copied from github the previous work
+//   //x,y -> pixel location
+//   //r,g,b -> new pixel color
 //   let index = (width * y + x) * 4
 //   setPixelOneD(index, r, g, b);
 // }
 
-// function getAvg(x, y) {
+// function getAvg(x, y) { // copied from github the previous work
 //   //return the avg intensity of pixel (x,y);
 //   let i = (width * y + x) * 4
 //   let r = pixels[i];
@@ -281,6 +279,7 @@
 //   let midY = height/2;
 
 //   // cut the four quadrants from the original image
+//   // the method i used before (defining the 4 quandrants and copy then agin) doesn't work as I expected, the 4 quandrants messed around so i deciede to use get()
 //   let Q1 = myImage.get(0, 0, midX, midY); // top-left
 //   let Q2 = myImage.get(midX, 0,midX, midY); // top-right
 //   let Q3 = myImage.get(0, midY, midX, midY); // bottom-left
