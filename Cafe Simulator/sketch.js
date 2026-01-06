@@ -18,6 +18,24 @@ let dayOneBoard;
 let dayOneState = "none";    // none -> showing -> moving -> counting
 let dayOneTimer = 120;       // 2 min countdown
 let dayOneStartTime = 0;     // record when board first appears
+let currentCustomer = null;
+let customer1;
+let customer2;
+let customer3;
+let customer4;
+let customer5;
+let customerImgs = [];
+let rightClicker;
+let kitchenPage;
+let leftClicker;
+
+// left clicker button area
+let lcX, lcY, lcW, lcH;
+
+
+// right clicker button area
+let rcX, rcY, rcW, rcH;
+
 
 // board animation values
 let boardX, boardY;
@@ -27,7 +45,7 @@ let boardW, boardH;
 let targetX, targetY;        // final small position (top-right)
 let targetW, targetH;        // final small size (scaled)
 
-let gameState = "start"; // start -> tutorial -> tutorial2 -> tutorial3 -> orderPage
+let gameState = "start"; // start -> tutorial -> tutorial2 -> tutorial3 -> orderPage -> kitchen
 
 // check the area of cancel button
 let cancelX, cancelY, cancelW, cancelH;
@@ -42,7 +60,29 @@ async function loadAssets() {
   cafeOrderPage = await loadImage("assets/cafeorderpage.png");
   pressToContinueImg = await loadImage("assets/presstocontinue.png");
   dayOneBoard = await loadImage("assets/dayonestartboard.png");
+  rightClicker = await loadImage("assets/rightclicker.png");
+  kitchenPage = await loadImage("assets/kitchenpage.png");
+  leftClicker = await loadImage("assets/leftclicker.png");
+
+
+
+  // customers (same style)
+  customer1 = await loadImage("assets/c1.png");
+  customer2 = await loadImage("assets/c2.png");
+  customer3 = await loadImage("assets/c3.png");
+  customer4 = await loadImage("assets/c4.png");
+  customer5 = await loadImage("assets/c5.png");
+
+  // collect them
+  customerImgs = [
+    customer1,
+    customer2,
+    customer3,
+    customer4,
+    customer5
+  ];
 }
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -80,7 +120,7 @@ function draw() {
 
     // space to next page
     if (keyIsDown(32)) { 
-        gameState = "tutorial";
+      gameState = "tutorial";
     }
   }
 
@@ -105,7 +145,30 @@ function draw() {
 
     // draw the dayoneboard
     drawDayOneBoard();
+    drawRightClicker();
+
+    if (dayOneState === "counting" && currentCustomer === null) {
+      spawnCustomer();
+    }
+    
+    if (currentCustomer) {
+      currentCustomer.update();
+      currentCustomer.display();
+    }
+    
   }
+
+  else if (gameState === "kitchen") {
+
+    // draw kitchen background (fixed scale)
+    let kW = kitchenPage.width * GLOBAL_SCALE;
+    let kH = kitchenPage.height * GLOBAL_SCALE;
+    image(kitchenPage, (width - kW) / 2, (height - kH) / 2, kW, kH);
+  
+    // still show the right clicker so you can go back
+    drawLeftClicker();
+  }
+  
 }
 
 function drawTutorialPage(boardImg) {
@@ -161,6 +224,18 @@ function keyPressed() {
 
 // cancel (exit tutorial) 
 function mousePressed() {
+    // orderPage -> kitchen
+  if (gameState === "orderPage" && mouseInRightClicker()) {
+    gameState = "kitchen";
+    return;
+  }
+
+  // kitchen -> orderPage
+  if (gameState === "kitchen" && mouseInLeftClicker()) {
+    gameState = "orderPage";
+    return;
+  }
+
 
   if (mouseInCancel()&& (gameState === "tutorial" || gameState === "tutorial2" || gameState === "tutorial3")) {
     gameState = "orderPage";
@@ -187,8 +262,7 @@ function mousePressed() {
 
 
 function mouseInCancel() {
-  return (mouseX > cancelX && mouseX < cancelX + cancelW && 
-          mouseY > cancelY && mouseY < cancelY + cancelH);
+  return (mouseX > cancelX && mouseX < cancelX + cancelW && mouseY > cancelY && mouseY < cancelY + cancelH);
 }
 
 function drawDayOneBoard() {
@@ -267,3 +341,105 @@ function drawDayOneBoard() {
       text(remaining + "s", textX, textY);
   }
 }
+
+class customers {
+  constructor(img) {
+
+    this.img = img;
+
+    // size (smaller)
+    this.w = this.img.width * GLOBAL_SCALE * 0.35;
+    this.h = this.img.height * GLOBAL_SCALE * 0.35;
+
+    // start position
+    this.x = width + this.w;
+    this.y = height / 2 - 40;  
+
+
+    // mid point
+    this.targetX = width / 2 + 180;
+
+    this.speed = 6;
+    this.state = "entering"; // entering -> waiting -> leaving
+  }
+
+  update() {
+    if (this.state === "entering") {
+      this.x -= this.speed;
+      if (this.x <= this.targetX) {
+        this.x = this.targetX;
+        this.state = "waiting";
+      }
+    }
+
+    else if (this.state === "leaving") {
+      this.x += this.speed;
+      if (this.x > width + this.w) {
+        currentCustomer = null; // when one finish the next appear
+      }
+    }
+  }
+
+  display() {
+    image(this.img, this.x, this.y, this.w, this.h);
+  }
+
+  finishOrder() {
+    this.state = "leaving";
+  }
+}
+
+function spawnCustomer() {
+  if (currentCustomer !== null) return;
+
+  let index = floor(random(customerImgs.length));
+  let img = customerImgs[index];
+
+  currentCustomer = new customers(img);
+}
+
+function drawRightClicker() {
+  if (dayOneState === "none") return;
+  if (gameState !== "orderPage") return;
+
+  rcW = 140;
+  rcH = 140;
+
+  rcX = width - rcW - 30;
+  rcY = 30;
+
+  let hovering = mouseX > rcX && mouseX < rcX + rcW &&
+                 mouseY > rcY && mouseY < rcY + rcH;
+
+  if (hovering) tint(200);
+  image(rightClicker, rcX, rcY, rcW, rcH);
+  tint(255);
+}
+
+function mouseInRightClicker() {
+  return mouseX > rcX && mouseX < rcX + rcW &&
+         mouseY > rcY && mouseY < rcY + rcH;
+}
+
+function drawLeftClicker() {
+  if (gameState !== "kitchen") return;
+
+  lcW = 140;
+  lcH = 140;
+
+  lcX = 30;
+  lcY = 30;
+
+  let hovering = mouseX > lcX && mouseX < lcX + lcW &&
+                 mouseY > lcY && mouseY < lcY + lcH;
+
+  if (hovering) tint(200);
+  image(leftClicker, lcX, lcY, lcW, lcH);
+  tint(255);
+}
+
+function mouseInLeftClicker() {
+  return mouseX > lcX && mouseX < lcX + lcW &&
+         mouseY > lcY && mouseY < lcY + lcH;
+}
+
