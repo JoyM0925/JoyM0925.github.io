@@ -54,6 +54,17 @@ let order5;
 
 let orderImgs = [];
 
+let orders = [
+  { drink: "tea",    topping: "redbean" },   // C1 catmush
+  { drink: "orange", topping: "boba" },      // C2 bearmush
+  { drink: "coffee", topping: "coconut" },   // C3 kidmush
+  { drink: "tea",    topping: "boba" },      // C4 witchmush
+  { drink: "orange", topping: "coconut" }    // C5 pigmush
+];
+
+let score = 0;
+let scorePopupText = "";
+let scorePopupStartTime = 0;
 
 
 
@@ -109,7 +120,7 @@ async function loadAssets() {
   bobaTopping = await loadImage("assets/boba.png");
 
 
-  //order
+  // order
   order1 = await loadImage("assets/c1order.png");
   order2 = await loadImage("assets/c2order.png");
   order3 = await loadImage("assets/c3order.png");
@@ -132,7 +143,7 @@ async function loadAssets() {
   customer4 = await loadImage("assets/c4.png");
   customer5 = await loadImage("assets/c5.png");
 
-  // collect them
+  // collect
   customerImgs = [
     customer1,
     customer2,
@@ -205,6 +216,8 @@ function draw() {
     // draw the dayoneboard
     drawDayOneBoard();
     drawRightClicker();
+    drawScorePopup();
+
 
     if (dayOneState === "counting" && currentCustomer === null) {
       spawnCustomer();
@@ -236,6 +249,8 @@ function draw() {
     drawPlaceCup(); 
     // still show the right clicker so you can go back
     drawLeftClicker();
+    drawScorePopup();
+
   }
   
 }
@@ -396,6 +411,21 @@ function mousePressed() {
       currentTopping = "coconut";
       return;
     }
+
+    // finish button (submit)
+    let fbW = finishButton.width * GLOBAL_SCALE * 0.2;
+    let fbH = finishButton.height * GLOBAL_SCALE * 0.2;
+    let fbX = 700;
+    let fbY = 650;
+
+    if (
+      mouseX > fbX && mouseX < fbX + fbW &&
+      mouseY > fbY && mouseY < fbY + fbH
+    ) {
+      submitOrder();
+      return;
+    }
+
   }
   
 }
@@ -483,10 +513,11 @@ function drawDayOneBoard() {
 }
 
 class customers {
-  constructor(img, orderImg) {
+  constructor(img, orderImg, orderData) {
 
     this.img = img;
     this.orderImg = orderImg;
+    this.order = orderData;   
 
     // size
     this.w = this.img.width * GLOBAL_SCALE * 0.35;
@@ -548,12 +579,14 @@ function spawnCustomer() {
   if (currentCustomer !== null) return;
 
   let index = floor(random(customerImgs.length));
+
   let img = customerImgs[index];
   let orderImg = orderImgs[index];
+  let orderData = orders[index];
 
-  currentCustomer = new customers(img, orderImg);
-
+  currentCustomer = new customers(img, orderImg, orderData);
 }
+
 
 function drawRightClicker() {
   if (dayOneState === "none") return;
@@ -779,10 +812,55 @@ function drawFinishButton() {
   let fbW = finishButton.width * GLOBAL_SCALE * 0.2;
   let fbH = finishButton.height * GLOBAL_SCALE * 0.2;
 
-  // under coconut bowl
   let fbX = 700;
   let fbY = 650;
 
+  let hovering =
+    mouseX > fbX && mouseX < fbX + fbW &&
+    mouseY > fbY && mouseY < fbY + fbH;
+
+  if (hovering) tint(200);
   image(finishButton, fbX, fbY, fbW, fbH);
+  tint(255);
 }
 
+
+function submitOrder() {
+  if (!currentCustomer) return;
+
+  let correctDrink = currentCustomer.order.drink;
+  let correctTopping = currentCustomer.order.topping;
+
+  if (currentDrink === correctDrink && currentTopping === correctTopping) {
+    score += 100;
+    scorePopupText = "+100";
+  } else {
+    score -= 50;
+    scorePopupText = "-50";
+  }
+
+  scorePopupStartTime = millis();
+
+  // reset player state
+  currentDrink = "empty";
+  currentTopping = "none";
+
+  // customer leaves
+  currentCustomer.finishOrder();
+}
+
+function drawScorePopup() {
+  if (scorePopupText === "") return;
+
+  let elapsed = millis() - scorePopupStartTime;
+  if (elapsed > 1000) {
+    scorePopupText = "";
+    return;
+  }
+
+  fill(185, 60, 60); // 红色
+  noStroke();
+  textAlign(RIGHT, TOP);
+  textSize(32);
+  text(scorePopupText, width - 30, 30);
+}
