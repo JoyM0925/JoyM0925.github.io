@@ -2,7 +2,7 @@
 // Joy M
 // Dec 4, 2025
 
-let GLOBAL_SCALE = 0.18;  //make the canva stay in a fixed scale no matter what the scale of the window is
+let globalscale = 0.18//make the canva stay in a fixed scale no matter what the scale of the window is
 let startImage;
 let blurImage;
 let tutorialBoard;
@@ -16,7 +16,7 @@ let pulseSpeed = 0.003; //
 let pulseGrowing = true;
 let dayOneBoard;
 let dayOneState = "none";    // none -> showing -> moving -> counting -> ending -> result
-let dayOneTimer = 100;       // 100s countdown
+let dayOneTimer = 1;       // 100s countdown
 let dayOneStartTime = 0;     // record when board first appears
 let currentCustomer = null;
 let customer1;
@@ -65,6 +65,12 @@ let orders = [
 let score = 0;
 let scorePopupText = "";
 let scorePopupStartTime = 0;
+
+let boardClicker;
+let restartButton;
+
+let showBoardClicker = false;
+let showResultText = false;
 
 
 
@@ -118,6 +124,9 @@ async function loadAssets() {
   redBeanTopping = await loadImage("assets/redbean.png");
   coconutJellyTopping = await loadImage("assets/coconutjelly.png");
   bobaTopping = await loadImage("assets/boba.png");
+  boardClicker = await loadImage("assets/boardclicker.png");
+  restartButton = await loadImage("assets/restartbutton.png");
+
 
 
   // order
@@ -165,8 +174,8 @@ function draw() {
   if (gameState === "start") {
 
     // start image (fixed scale)
-    let sW = startImage.width * GLOBAL_SCALE;
-    let sH = startImage.height * GLOBAL_SCALE;
+    let sW = startImage.width * globalscale;
+    let sH = startImage.height * globalscale;
     image(startImage, (width - sW) / 2, (height - sH) / 2, sW, sH);
 
     // like breath
@@ -183,8 +192,8 @@ function draw() {
       pulseGrowing = true; // however when i only change the number of pulsescale this part still worked so i kept it
     }
 
-    let pW = pressToContinueImg.width * GLOBAL_SCALE * pulseScale;
-    let pH = pressToContinueImg.height * GLOBAL_SCALE * pulseScale;
+    let pW = pressToContinueImg.width * globalscale * pulseScale;
+    let pH = pressToContinueImg.height * globalscale * pulseScale;
 
     image(pressToContinueImg, 0, -240, pW, pH);
 
@@ -209,8 +218,8 @@ function draw() {
   else if (gameState === "orderPage") {
 
     // draw the cafe background
-    let oW = cafeOrderPage.width * GLOBAL_SCALE;
-    let oH = cafeOrderPage.height * GLOBAL_SCALE;
+    let oW = cafeOrderPage.width * globalscale;
+    let oH = cafeOrderPage.height * globalscale;
     image(cafeOrderPage, (width - oW) / 2, (height - oH) / 2, oW, oH);
 
     // draw the dayoneboard
@@ -233,8 +242,8 @@ function draw() {
   else if (gameState === "kitchen") {
 
     // draw kitchen background (fixed scale)
-    let kW = kitchenPage.width * GLOBAL_SCALE;
-    let kH = kitchenPage.height * GLOBAL_SCALE;
+    let kW = kitchenPage.width * globalscale;
+    let kH = kitchenPage.height * globalscale;
     image(kitchenPage, (width - kW) / 2, (height - kH) / 2, kW, kH);
   
   
@@ -258,13 +267,13 @@ function draw() {
 function drawTutorialPage(boardImg) {
 
   // background (fixed scale)
-  let bW = blurImage.width * GLOBAL_SCALE;
-  let bH = blurImage.height * GLOBAL_SCALE;
+  let bW = blurImage.width * globalscale;
+  let bH = blurImage.height * globalscale;
   image(blurImage, (width - bW) / 2, (height - bH) / 2, bW, bH);
 
   // board scale
-  let displayW = boardImg.width * GLOBAL_SCALE;
-  let displayH = boardImg.height * GLOBAL_SCALE;
+  let displayW = boardImg.width * globalscale;
+  let displayH = boardImg.height * globalscale;
 
   let x = (width - displayW) / 2;
   let y = (height - displayH) / 2; 
@@ -308,6 +317,46 @@ function keyPressed() {
 
 // cancel (exit tutorial) 
 function mousePressed() {
+  // board clicker 点击
+  if (dayOneState === "result" && showBoardClicker) {
+
+    let bcW = boardClicker.width * globalscale * 0.25;
+    let bcH = boardClicker.height * globalscale * 0.25;
+
+    let bcX = 725;
+    let bcY = 400;
+
+    if (
+      mouseX > bcX && mouseX < bcX + bcW &&
+      mouseY > bcY && mouseY < bcY + bcH
+    ) {
+      showBoardClicker = false;
+      showResultText = true;
+      return;
+    }
+  }
+
+
+  // 点击 restart
+  if (dayOneState === "result" && showResultText) {
+
+    let rW = restartButton.width * globalscale * 0.3;
+    let rH = restartButton.height * globalscale * 0.3;
+
+    let rX = boardX + boardW / 2 - rW / 2;
+    let rY = boardY + boardH * 0.65;
+
+    if (
+      mouseX > rX && mouseX < rX + rW &&
+      mouseY > rY && mouseY < rY + rH
+    ) {
+      restartGame();
+      return;
+    }
+  }
+
+
+
     // orderPage -> kitchen
   if (gameState === "orderPage" && mouseInRightClicker()) {
     gameState = "kitchen";
@@ -327,8 +376,8 @@ function mousePressed() {
     dayOneStartTime = millis();
   
     //  full scale
-    boardW = dayOneBoard.width * GLOBAL_SCALE;
-    boardH = dayOneBoard.height * GLOBAL_SCALE;
+    boardW = dayOneBoard.width * globalscale;
+    boardH = dayOneBoard.height * globalscale;
   
     boardX = (width - boardW) / 2;
     boardY = (height - boardH) / 2 ;
@@ -347,8 +396,8 @@ function mousePressed() {
   if (gameState === "kitchen") {
 
     // tea button
-    let tW = teaButton.width * GLOBAL_SCALE * 0.1;  
-    let tH = teaButton.height * GLOBAL_SCALE * 0.1;
+    let tW = teaButton.width * globalscale * 0.1;  
+    let tH = teaButton.height * globalscale * 0.1;
     let tX = 100;
     let tY = 200;
     if (mouseX > tX && mouseX < tX + tW && mouseY > tY && mouseY < tY + tH) {
@@ -357,8 +406,8 @@ function mousePressed() {
     }
 
     // orange button
-    let ojW = orangeJuiceButton.width * GLOBAL_SCALE * 0.1;
-    let ojH = orangeJuiceButton.height * GLOBAL_SCALE * 0.1;
+    let ojW = orangeJuiceButton.width * globalscale * 0.1;
+    let ojH = orangeJuiceButton.height * globalscale * 0.1;
     let ojX = 220;
     let ojY = 200;
     if (mouseX > ojX && mouseX < ojX + ojW && mouseY > ojY && mouseY < ojY + ojH) {
@@ -367,8 +416,8 @@ function mousePressed() {
     }
 
     // coffee button
-    let cbW = coffeeButton.width * GLOBAL_SCALE * 0.1;
-    let cbH = coffeeButton.height * GLOBAL_SCALE * 0.1;
+    let cbW = coffeeButton.width * globalscale * 0.1;
+    let cbH = coffeeButton.height * globalscale * 0.1;
     let cbX = 340;
     let cbY = 200;
     if (mouseX > cbX && mouseX < cbX + cbW && mouseY > cbY && mouseY < cbY + cbH) {
@@ -380,8 +429,8 @@ function mousePressed() {
   if (gameState === "kitchen") {
 
     // red bean topping
-    let rbW = redBeanBowl.width * GLOBAL_SCALE * 0.2;
-    let rbH = redBeanBowl.height * GLOBAL_SCALE * 0.2;
+    let rbW = redBeanBowl.width * globalscale * 0.2;
+    let rbH = redBeanBowl.height * globalscale * 0.2;
     if (
       mouseX > 570 && mouseX < 570 + rbW &&
       mouseY > 300 && mouseY < 300 + rbH
@@ -391,8 +440,8 @@ function mousePressed() {
     }
   
     // boba topping
-    let bbW = blackBobaBowl.width * GLOBAL_SCALE * 0.2;
-    let bbH = blackBobaBowl.height * GLOBAL_SCALE * 0.2;
+    let bbW = blackBobaBowl.width * globalscale * 0.2;
+    let bbH = blackBobaBowl.height * globalscale * 0.2;
     if (
       mouseX > 850 && mouseX < 850 + bbW &&
       mouseY > 300 && mouseY < 300 + bbH
@@ -402,8 +451,8 @@ function mousePressed() {
     }
   
     // coconut jelly topping
-    let cbW = coconutBowl.width * GLOBAL_SCALE * 0.2;
-    let cbH = coconutBowl.height * GLOBAL_SCALE * 0.2;
+    let cbW = coconutBowl.width * globalscale * 0.2;
+    let cbH = coconutBowl.height * globalscale * 0.2;
     if (
       mouseX > 650 && mouseX < 650 + cbW &&
       mouseY > 480 && mouseY < 480 + cbH
@@ -413,8 +462,8 @@ function mousePressed() {
     }
 
     // finish button (submit)
-    let fbW = finishButton.width * GLOBAL_SCALE * 0.2;
-    let fbH = finishButton.height * GLOBAL_SCALE * 0.2;
+    let fbW = finishButton.width * globalscale * 0.2;
+    let fbH = finishButton.height * globalscale * 0.2;
     let fbX = 700;
     let fbY = 650;
 
@@ -517,8 +566,8 @@ function drawDayOneBoard() {
       currentCustomer = null;
 
       // 设置“放大回中心”的目标
-      targetW = dayOneBoard.width * GLOBAL_SCALE;
-      targetH = dayOneBoard.height * GLOBAL_SCALE;
+      targetW = dayOneBoard.width * globalscale;
+      targetH = dayOneBoard.height * globalscale;
       targetX = (width - targetW) / 2;
       targetY = (height - targetH) / 2;
     }
@@ -539,7 +588,9 @@ function drawDayOneBoard() {
     let d = dist(boardX, boardY, targetX, targetY);
     if (d < 8) {
       dayOneState = "result";
+      showBoardClicker = true;
     }
+    
   
     return;
   }
@@ -551,18 +602,38 @@ function drawDayOneBoard() {
     textAlign(CENTER, CENTER);
     noStroke();
   
-    // SCORE 标题
-    fill(0);
-    textSize(boardH * 0.18);
-    text("SCORE", boardX + boardW / 2, boardY + boardH * 0.45);
+    if (!showResultText) {
+      // 阶段一：显示 SCORE
+      fill(0);
+      textSize(boardH * 0.18);
+      text("SCORE", boardX + boardW / 2, boardY + boardH * 0.42);
   
-    // 分数
-    fill(185, 60, 60);
-    textSize(boardH * 0.22);
-    text(score, boardX + boardW / 2, boardY + boardH * 0.6);
+      fill(185, 60, 60);
+      textSize(boardH * 0.22);
+      text(score, boardX + boardW / 2, boardY + boardH * 0.58);
+    } 
+    else {
+      // 阶段二：PASS / FAIL
+      fill(0);
+      textSize(boardH * 0.2);
+  
+      let resultText = score > 1000 ? "YOU PASSED" : "YOU FAILED";
+      text(resultText, boardX + boardW / 2, boardY + boardH * 0.48);
+    }
+  
+    // board clicker
+    if (showBoardClicker) {
+      drawBoardClicker();
+    }
+  
+    // restart button
+    if (showResultText) {
+      drawRestartButton();
+    }
   
     return;
   }
+  
   
   
 }
@@ -575,8 +646,8 @@ class customers {
     this.order = orderData;   
 
     // size
-    this.w = this.img.width * GLOBAL_SCALE * 0.35;
-    this.h = this.img.height * GLOBAL_SCALE * 0.35;
+    this.w = this.img.width * globalscale * 0.35;
+    this.h = this.img.height * globalscale * 0.35;
 
     // start position
     this.x = width + this.w;
@@ -614,8 +685,8 @@ class customers {
     // draw order box above head
     if (this.state === "waiting" && this.orderImg) {
   
-      let oW = this.orderImg.width * GLOBAL_SCALE * 0.4;
-      let oH = this.orderImg.height * GLOBAL_SCALE * 0.4;
+      let oW = this.orderImg.width * globalscale * 0.4;
+      let oH = this.orderImg.height * globalscale * 0.4;
   
       let oX = this.x + this.w / 2 - oW / 2;
       let oY = this.y - oH + 20;
@@ -691,8 +762,8 @@ function mouseInLeftClicker() {
 function drawLiquidMachine() {
   if (gameState !== "kitchen") return;
 
-  let lmW = liquidMachine.width * GLOBAL_SCALE * 0.5
-  let lmH = liquidMachine.height * GLOBAL_SCALE * 0.5;
+  let lmW = liquidMachine.width * globalscale * 0.5
+  let lmH = liquidMachine.height * globalscale * 0.5;
 
   let lmX = 30;
   let lmY = 0;
@@ -704,8 +775,8 @@ function drawPlaceCup() {
   if (gameState !== "kitchen") return;
 
   // cup size  
-  let pcW = placeCup.width * GLOBAL_SCALE * 0.35;
-  let pcH = placeCup.height * GLOBAL_SCALE * 0.35;
+  let pcW = placeCup.width * globalscale * 0.35;
+  let pcH = placeCup.height * globalscale * 0.35;
 
   let pcX = 80;
   let pcY = 460;
@@ -721,8 +792,8 @@ function drawPlaceCup() {
 
   let dX = 200
   let dY = 400
-  let dW = img.width * GLOBAL_SCALE * 0.2;
-  let dH = img.height * GLOBAL_SCALE * 0.2;
+  let dW = img.width * globalscale * 0.2;
+  let dH = img.height * globalscale * 0.2;
 
   image(img, dX, dY, dW, dH);
 
@@ -733,8 +804,8 @@ function drawPlaceCup() {
   else if (currentTopping === "boba") toppingImg = bobaTopping;
 
   if (toppingImg) {
-    let tW = toppingImg.width * GLOBAL_SCALE * 0.08;
-    let tH = toppingImg.height * GLOBAL_SCALE * 0.08;
+    let tW = toppingImg.width * globalscale * 0.08;
+    let tH = toppingImg.height * globalscale * 0.08;
 
     let tX = 235;
     let tY = 530;
@@ -748,8 +819,8 @@ function drawPlaceCup() {
 function drawRedBeanBowl() {
   if (gameState !== "kitchen") return;
 
-  let rbW = redBeanBowl.width * GLOBAL_SCALE * 0.2;
-  let rbH = redBeanBowl.height * GLOBAL_SCALE * 0.2;
+  let rbW = redBeanBowl.width * globalscale * 0.2;
+  let rbH = redBeanBowl.height * globalscale * 0.2;
 
   let rbX = 570;
   let rbY = 300;
@@ -767,8 +838,8 @@ function drawRedBeanBowl() {
 function drawBlackBobaBowl() {
   if (gameState !== "kitchen") return;
 
-  let bbW = blackBobaBowl.width * GLOBAL_SCALE * 0.2;
-  let bbH = blackBobaBowl.height * GLOBAL_SCALE * 0.2;
+  let bbW = blackBobaBowl.width * globalscale * 0.2;
+  let bbH = blackBobaBowl.height * globalscale * 0.2;
 
   let bbX = 850;
   let bbY = 300;
@@ -786,8 +857,8 @@ function drawBlackBobaBowl() {
 function drawCoconutBowl() {
   if (gameState !== "kitchen") return;
 
-  let cbW = coconutBowl.width * GLOBAL_SCALE * 0.2;
-  let cbH = coconutBowl.height * GLOBAL_SCALE * 0.2;
+  let cbW = coconutBowl.width * globalscale * 0.2;
+  let cbH = coconutBowl.height * globalscale * 0.2;
 
   let cbX = 650;
   let cbY = 480;
@@ -805,8 +876,8 @@ function drawCoconutBowl() {
 function drawCoffeeButton() {
   if (gameState !== "kitchen") return;
 
-  let cbW = coffeeButton.width * GLOBAL_SCALE * 0.1;
-  let cbH = coffeeButton.height * GLOBAL_SCALE * 0.1;
+  let cbW = coffeeButton.width * globalscale * 0.1;
+  let cbH = coffeeButton.height * globalscale * 0.1;
 
   let cbX = 340;
   let cbY = 200;
@@ -824,8 +895,8 @@ function drawCoffeeButton() {
 function drawOrangeJuiceButton() {
   if (gameState !== "kitchen") return;
 
-  let ojW = orangeJuiceButton.width * GLOBAL_SCALE * 0.1;
-  let ojH = orangeJuiceButton.height * GLOBAL_SCALE * 0.1;
+  let ojW = orangeJuiceButton.width * globalscale * 0.1;
+  let ojH = orangeJuiceButton.height * globalscale * 0.1;
 
   let ojX = 220;
   let ojY = 200;
@@ -843,8 +914,8 @@ function drawOrangeJuiceButton() {
 function drawTeaButton() {
   if (gameState !== "kitchen") return;
 
-  let tW = teaButton.width * GLOBAL_SCALE * 0.1;
-  let tH = teaButton.height * GLOBAL_SCALE * 0.1;
+  let tW = teaButton.width * globalscale * 0.1;
+  let tH = teaButton.height * globalscale * 0.1;
 
   let tX = 100; 
   let tY = 200;  
@@ -862,8 +933,8 @@ function drawTeaButton() {
 function drawFinishButton() {
   if (gameState !== "kitchen") return;
 
-  let fbW = finishButton.width * GLOBAL_SCALE * 0.2;
-  let fbH = finishButton.height * GLOBAL_SCALE * 0.2;
+  let fbW = finishButton.width * globalscale * 0.2;
+  let fbH = finishButton.height * globalscale * 0.2;
 
   let fbX = 700;
   let fbY = 650;
@@ -887,7 +958,8 @@ function submitOrder() {
   if (currentDrink === correctDrink && currentTopping === correctTopping) {
     score += 100;
     scorePopupText = "+100";
-  } else {
+  } 
+  else {
     score -= 50;
     scorePopupText = "-50";
   }
@@ -898,7 +970,7 @@ function submitOrder() {
   currentDrink = "empty";
   currentTopping = "none";
 
-  // 关键：直接结束当前顾客逻辑占用
+  // 直接结束当前顾客逻辑占用
   currentCustomer.finishOrder();
   currentCustomer = null;   // 这一行是关键
 }
@@ -920,4 +992,56 @@ function drawScorePopup() {
   text(scorePopupText, width - 30, 30);
 }
 
+function drawBoardClicker() {
 
+  let bcW = boardClicker.width * globalscale * 0.2;
+  let bcH = boardClicker.height * globalscale * 0.2;
+
+  let bcX = 725;
+  let bcY = 400;
+
+  let hovering =
+    mouseX > bcX && mouseX < bcX + bcW &&
+    mouseY > bcY && mouseY < bcY + bcH;
+
+  if (hovering) tint(200);
+  image(boardClicker, bcX, bcY, bcW, bcH);
+  tint(255);
+}
+
+
+function drawRestartButton() {
+
+  let rW = restartButton.width * globalscale * 0.2;
+  let rH = restartButton.height * globalscale * 0.2;
+
+  let rX = 550;
+  let rY = 450;
+
+  let hovering =
+    mouseX > rX && mouseX < rX + rW &&
+    mouseY > rY && mouseY < rY + rH;
+
+  if (hovering) tint(200);
+  image(restartButton, rX, rY, rW, rH);
+  tint(255);
+}
+
+
+function restartGame() {
+
+  // game state
+  gameState = "start";
+
+  // day one
+  dayOneState = "none";
+  showBoardClicker = false;
+  showResultText = false;
+
+  // gameplay
+  score = 0;
+  currentCustomer = null;
+
+  // visuals
+  pulseScale = 1;
+}
