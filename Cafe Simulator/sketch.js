@@ -2,7 +2,7 @@
 // Joy M
 // Dec 4, 2025
 
-let GLOBAL_SCALE = 0.18; //make the canva stay in a fixed scale no matter what the scale of the window is
+let GLOBAL_SCALE = 0.18;  //make the canva stay in a fixed scale no matter what the scale of the window is
 let startImage;
 let blurImage;
 let tutorialBoard;
@@ -15,8 +15,8 @@ let pulseScale = 1;
 let pulseSpeed = 0.003; // 
 let pulseGrowing = true;
 let dayOneBoard;
-let dayOneState = "none";    // none -> showing -> moving -> counting
-let dayOneTimer = 120;       // 2 min countdown
+let dayOneState = "none";    // none -> showing -> moving -> counting -> ending -> result
+let dayOneTimer = 100;       // 100s countdown
 let dayOneStartTime = 0;     // record when board first appears
 let currentCustomer = null;
 let customer1;
@@ -28,6 +28,45 @@ let customerImgs = [];
 let rightClicker;
 let kitchenPage;
 let leftClicker;
+let liquidMachine;
+let placeCup;
+let redBeanBowl;
+let blackBobaBowl;
+let coconutBowl;
+let coffeeButton;
+let orangeJuiceButton;
+let teaButton;
+let finishButton; 
+let currentDrink = "empty"; // empty || coffee || orange || tea
+let emptyGlass;
+let coffeeDrink;
+let orangeDrink;
+let teaDrink;
+let currentTopping = "none"; // none || redbean || coconut || boba
+let redBeanTopping;
+let coconutJellyTopping;
+let bobaTopping;
+let order1;
+let order2;
+let order3;
+let order4;
+let order5;
+
+let orderImgs = [];
+
+let orders = [
+  { drink: "tea",    topping: "redbean" },   // C1 catmush
+  { drink: "orange", topping: "boba" }, // C2 bearmush
+  { drink: "coffee", topping: "coconut" }, // C3 kidmush
+  { drink: "tea",    topping: "boba" }, // C4 witchmush
+  { drink: "orange", topping: "coconut" }  // C5 pigmush
+];
+
+let score = 0;
+let scorePopupText = "";
+let scorePopupStartTime = 0;
+
+
 
 // left clicker button area
 let lcX, lcY, lcW, lcH;
@@ -63,17 +102,48 @@ async function loadAssets() {
   rightClicker = await loadImage("assets/rightclicker.png");
   kitchenPage = await loadImage("assets/kitchenpage.png");
   leftClicker = await loadImage("assets/leftclicker.png");
+  liquidMachine = await loadImage("assets/liquidmachine.png");
+  placeCup = await loadImage("assets/placecup.png");
+  redBeanBowl = await loadImage("assets/redbeanbowl.png");
+  blackBobaBowl = await loadImage("assets/blackbobabowl.png");
+  coconutBowl = await loadImage("assets/coconutbowl.png");
+  coffeeButton = await loadImage("assets/coffebotton.png");
+  orangeJuiceButton = await loadImage("assets/orangejuicebutton.png");
+  teaButton = await loadImage("assets/teabutton.png");
+  finishButton = await loadImage("assets/finishbutton.png");
+  emptyGlass = await loadImage("assets/emptyglass.png");
+  coffeeDrink = await loadImage("assets/coffee.png");
+  orangeDrink = await loadImage("assets/orangejuice.png");
+  teaDrink = await loadImage("assets/tea.png");
+  redBeanTopping = await loadImage("assets/redbean.png");
+  coconutJellyTopping = await loadImage("assets/coconutjelly.png");
+  bobaTopping = await loadImage("assets/boba.png");
 
 
+  // order
+  order1 = await loadImage("assets/c1order.png");
+  order2 = await loadImage("assets/c2order.png");
+  order3 = await loadImage("assets/c3order.png");
+  order4 = await loadImage("assets/c4order.png");
+  order5 = await loadImage("assets/c5order.png");
 
-  // customers (same style)
+  orderImgs = [
+    order1,
+    order2,
+    order3,
+    order4,
+    order5
+  ];
+
+
+  // customers 
   customer1 = await loadImage("assets/c1.png");
   customer2 = await loadImage("assets/c2.png");
   customer3 = await loadImage("assets/c3.png");
   customer4 = await loadImage("assets/c4.png");
   customer5 = await loadImage("assets/c5.png");
 
-  // collect them
+  // collect
   customerImgs = [
     customer1,
     customer2,
@@ -85,7 +155,7 @@ async function loadAssets() {
 
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1100, 800);
   loadAssets();
 }
 
@@ -146,6 +216,8 @@ function draw() {
     // draw the dayoneboard
     drawDayOneBoard();
     drawRightClicker();
+    drawScorePopup();
+
 
     if (dayOneState === "counting" && currentCustomer === null) {
       spawnCustomer();
@@ -165,8 +237,20 @@ function draw() {
     let kH = kitchenPage.height * GLOBAL_SCALE;
     image(kitchenPage, (width - kW) / 2, (height - kH) / 2, kW, kH);
   
+  
+    drawLiquidMachine();
+    drawTeaButton();    
+    drawOrangeJuiceButton(); 
+    drawCoffeeButton(); 
+    drawRedBeanBowl();
+    drawBlackBobaBowl(); 
+    drawCoconutBowl(); 
+    drawFinishButton();
+    drawPlaceCup(); 
     // still show the right clicker so you can go back
     drawLeftClicker();
+    drawScorePopup();
+
   }
   
 }
@@ -254,10 +338,96 @@ function mousePressed() {
     targetH = boardH * 0.3;
   
     targetX = width/2 - 100;
-    targetY = 15;
+    targetY = 0;
   
     return;
   }
+
+    // kitchen drink buttons (click to change drink)
+  if (gameState === "kitchen") {
+
+    // tea button
+    let tW = teaButton.width * GLOBAL_SCALE * 0.1;  
+    let tH = teaButton.height * GLOBAL_SCALE * 0.1;
+    let tX = 100;
+    let tY = 200;
+    if (mouseX > tX && mouseX < tX + tW && mouseY > tY && mouseY < tY + tH) {
+      currentDrink = "tea";
+      return;
+    }
+
+    // orange button
+    let ojW = orangeJuiceButton.width * GLOBAL_SCALE * 0.1;
+    let ojH = orangeJuiceButton.height * GLOBAL_SCALE * 0.1;
+    let ojX = 220;
+    let ojY = 200;
+    if (mouseX > ojX && mouseX < ojX + ojW && mouseY > ojY && mouseY < ojY + ojH) {
+      currentDrink = "orange";
+      return;
+    }
+
+    // coffee button
+    let cbW = coffeeButton.width * GLOBAL_SCALE * 0.1;
+    let cbH = coffeeButton.height * GLOBAL_SCALE * 0.1;
+    let cbX = 340;
+    let cbY = 200;
+    if (mouseX > cbX && mouseX < cbX + cbW && mouseY > cbY && mouseY < cbY + cbH) {
+      currentDrink = "coffee";
+      return;
+    }
+  }
+
+  if (gameState === "kitchen") {
+
+    // red bean topping
+    let rbW = redBeanBowl.width * GLOBAL_SCALE * 0.2;
+    let rbH = redBeanBowl.height * GLOBAL_SCALE * 0.2;
+    if (
+      mouseX > 570 && mouseX < 570 + rbW &&
+      mouseY > 300 && mouseY < 300 + rbH
+    ) {
+      currentTopping = "redbean";
+      return;
+    }
+  
+    // boba topping
+    let bbW = blackBobaBowl.width * GLOBAL_SCALE * 0.2;
+    let bbH = blackBobaBowl.height * GLOBAL_SCALE * 0.2;
+    if (
+      mouseX > 850 && mouseX < 850 + bbW &&
+      mouseY > 300 && mouseY < 300 + bbH
+    ) {
+      currentTopping = "boba";
+      return;
+    }
+  
+    // coconut jelly topping
+    let cbW = coconutBowl.width * GLOBAL_SCALE * 0.2;
+    let cbH = coconutBowl.height * GLOBAL_SCALE * 0.2;
+    if (
+      mouseX > 650 && mouseX < 650 + cbW &&
+      mouseY > 480 && mouseY < 480 + cbH
+    ) {
+      currentTopping = "coconut";
+      return;
+    }
+
+    // finish button (submit)
+    let fbW = finishButton.width * GLOBAL_SCALE * 0.2;
+    let fbH = finishButton.height * GLOBAL_SCALE * 0.2;
+    let fbX = 700;
+    let fbY = 650;
+
+    if (
+      mouseX > fbX && mouseX < fbX + fbW &&
+      mouseY > fbY && mouseY < fbY + fbH
+    ) {
+      submitOrder();
+      return;
+    }
+
+  }
+  
 }
 
 
@@ -317,44 +487,100 @@ function drawDayOneBoard() {
 
   // counting down 
   if (dayOneState === "counting") {
+    image(dayOneBoard, boardX, boardY, boardW, boardH);
 
-      image(dayOneBoard, boardX, boardY, boardW, boardH);
+    // countdown
+    let elapsed = floor((millis() - dayOneStartTime) / 1000);
+    let remaining = max(0, dayOneTimer - elapsed);
 
-      // countdown
-      let elapsed = floor((millis() - dayOneStartTime) / 1000);
-      let remaining = max(0, dayOneTimer - elapsed);
+    // color change for last 20 seconds
+    if (remaining <= 20) {
+      fill(185, 60, 60);  // red for 20s remain warning
+    } 
+    else {
+      fill(0); // normal black
+    }
 
-      // color change for last 20 seconds
-      if (remaining <= 20) {
-        fill(185, 60, 60);  // red for 20s remain warning
-      } 
-      else {
-        fill(0); // normal black
-      }
+    textSize(boardH * 0.18);
+    textAlign(CENTER, CENTER);
 
-      textSize(boardH * 0.18);
-      textAlign(CENTER, CENTER);
+    let textX = boardX + boardW / 2;
+    let textY = boardY + boardH  - 115;
 
-      let textX = boardX + boardW / 2;
-      let textY = boardY + boardH  - 115;
+    text(remaining + "s", textX, textY);
+    // 倒计时结束
+    if (remaining === 0) {
 
-      text(remaining + "s", textX, textY);
+      dayOneState = "ending";
+
+      // 停止所有客人
+      currentCustomer = null;
+
+      // 设置“放大回中心”的目标
+      targetW = dayOneBoard.width * GLOBAL_SCALE;
+      targetH = dayOneBoard.height * GLOBAL_SCALE;
+      targetX = (width - targetW) / 2;
+      targetY = (height - targetH) / 2;
+    }
+
   }
+
+  if (dayOneState === "ending") {
+
+    // 板子放大 + 回到中心
+    boardX = lerp(boardX, targetX, 0.06);
+    boardY = lerp(boardY, targetY, 0.06);
+    boardW = lerp(boardW, targetW, 0.06);
+    boardH = lerp(boardH, targetH, 0.06);
+  
+    image(dayOneBoard, boardX, boardY, boardW, boardH);
+  
+    // 接近目标后，进入结果展示
+    let d = dist(boardX, boardY, targetX, targetY);
+    if (d < 8) {
+      dayOneState = "result";
+    }
+  
+    return;
+  }
+
+  if (dayOneState === "result") {
+
+    image(dayOneBoard, boardX, boardY, boardW, boardH);
+  
+    textAlign(CENTER, CENTER);
+    noStroke();
+  
+    // SCORE 标题
+    fill(0);
+    textSize(boardH * 0.18);
+    text("SCORE", boardX + boardW / 2, boardY + boardH * 0.45);
+  
+    // 分数
+    fill(185, 60, 60);
+    textSize(boardH * 0.22);
+    text(score, boardX + boardW / 2, boardY + boardH * 0.6);
+  
+    return;
+  }
+  
+  
 }
 
 class customers {
-  constructor(img) {
+  constructor(img, orderImg, orderData) {
 
     this.img = img;
+    this.orderImg = orderImg;
+    this.order = orderData;   
 
-    // size (smaller)
+    // size
     this.w = this.img.width * GLOBAL_SCALE * 0.35;
     this.h = this.img.height * GLOBAL_SCALE * 0.35;
 
     // start position
     this.x = width + this.w;
-    this.y = height / 2 - 40;  
-
+    this.y = height / 2 - 40;
 
     // mid point
     this.targetX = width / 2 + 180;
@@ -362,6 +588,7 @@ class customers {
     this.speed = 6;
     this.state = "entering"; // entering -> waiting -> leaving
   }
+
 
   update() {
     if (this.state === "entering") {
@@ -381,8 +608,22 @@ class customers {
   }
 
   display() {
+    // draw customer
     image(this.img, this.x, this.y, this.w, this.h);
+  
+    // draw order box above head
+    if (this.state === "waiting" && this.orderImg) {
+  
+      let oW = this.orderImg.width * GLOBAL_SCALE * 0.4;
+      let oH = this.orderImg.height * GLOBAL_SCALE * 0.4;
+  
+      let oX = this.x + this.w / 2 - oW / 2;
+      let oY = this.y - oH + 20;
+  
+      image(this.orderImg, oX, oY, oW, oH);
+    }
   }
+  
 
   finishOrder() {
     this.state = "leaving";
@@ -393,10 +634,14 @@ function spawnCustomer() {
   if (currentCustomer !== null) return;
 
   let index = floor(random(customerImgs.length));
-  let img = customerImgs[index];
 
-  currentCustomer = new customers(img);
+  let img = customerImgs[index];
+  let orderImg = orderImgs[index];
+  let orderData = orders[index];
+
+  currentCustomer = new customers(img, orderImg, orderData);
 }
+
 
 function drawRightClicker() {
   if (dayOneState === "none") return;
@@ -405,8 +650,8 @@ function drawRightClicker() {
   rcW = 140;
   rcH = 140;
 
-  rcX = width - rcW - 30;
-  rcY = 30;
+  rcX = 960;
+  rcY = height/2;
 
   let hovering = mouseX > rcX && mouseX < rcX + rcW &&
                  mouseY > rcY && mouseY < rcY + rcH;
@@ -427,8 +672,8 @@ function drawLeftClicker() {
   lcW = 140;
   lcH = 140;
 
-  lcX = 30;
-  lcY = 30;
+  lcX = 10;
+  lcY = height/2;
 
   let hovering = mouseX > lcX && mouseX < lcX + lcW &&
                  mouseY > lcY && mouseY < lcY + lcH;
@@ -442,4 +687,237 @@ function mouseInLeftClicker() {
   return mouseX > lcX && mouseX < lcX + lcW &&
          mouseY > lcY && mouseY < lcY + lcH;
 }
+
+function drawLiquidMachine() {
+  if (gameState !== "kitchen") return;
+
+  let lmW = liquidMachine.width * GLOBAL_SCALE * 0.5
+  let lmH = liquidMachine.height * GLOBAL_SCALE * 0.5;
+
+  let lmX = 30;
+  let lmY = 0;
+
+  image(liquidMachine, lmX, lmY, lmW, lmH);
+}
+
+function drawPlaceCup() {
+  if (gameState !== "kitchen") return;
+
+  // cup size  
+  let pcW = placeCup.width * GLOBAL_SCALE * 0.35;
+  let pcH = placeCup.height * GLOBAL_SCALE * 0.35;
+
+  let pcX = 80;
+  let pcY = 460;
+
+  // draw cup holder
+  image(placeCup, pcX, pcY, pcW, pcH);
+
+  // choose drink image
+  let img = emptyGlass;
+  if (currentDrink === "coffee") img = coffeeDrink;
+  else if (currentDrink === "orange") img = orangeDrink;
+  else if (currentDrink === "tea") img = teaDrink;
+
+  let dX = 200
+  let dY = 400
+  let dW = img.width * GLOBAL_SCALE * 0.2;
+  let dH = img.height * GLOBAL_SCALE * 0.2;
+
+  image(img, dX, dY, dW, dH);
+
+  // draw topping ABOVE drink
+  let toppingImg = null;
+  if (currentTopping === "redbean") toppingImg = redBeanTopping;
+  else if (currentTopping === "coconut") toppingImg = coconutJellyTopping;
+  else if (currentTopping === "boba") toppingImg = bobaTopping;
+
+  if (toppingImg) {
+    let tW = toppingImg.width * GLOBAL_SCALE * 0.08;
+    let tH = toppingImg.height * GLOBAL_SCALE * 0.08;
+
+    let tX = 235;
+    let tY = 530;
+
+    image(toppingImg, tX, tY, tW, tH);
+  }
+
+}
+
+
+function drawRedBeanBowl() {
+  if (gameState !== "kitchen") return;
+
+  let rbW = redBeanBowl.width * GLOBAL_SCALE * 0.2;
+  let rbH = redBeanBowl.height * GLOBAL_SCALE * 0.2;
+
+  let rbX = 570;
+  let rbY = 300;
+
+  let hovering =
+    mouseX > rbX && mouseX < rbX + rbW &&
+    mouseY > rbY && mouseY < rbY + rbH;
+
+  if (hovering) tint(200);
+  image(redBeanBowl, rbX, rbY, rbW, rbH);
+  tint(255);
+}
+
+
+function drawBlackBobaBowl() {
+  if (gameState !== "kitchen") return;
+
+  let bbW = blackBobaBowl.width * GLOBAL_SCALE * 0.2;
+  let bbH = blackBobaBowl.height * GLOBAL_SCALE * 0.2;
+
+  let bbX = 850;
+  let bbY = 300;
+
+  let hovering =
+    mouseX > bbX && mouseX < bbX + bbW &&
+    mouseY > bbY && mouseY < bbY + bbH;
+
+  if (hovering) tint(200);
+  image(blackBobaBowl, bbX, bbY, bbW, bbH);
+  tint(255);
+}
+
+
+function drawCoconutBowl() {
+  if (gameState !== "kitchen") return;
+
+  let cbW = coconutBowl.width * GLOBAL_SCALE * 0.2;
+  let cbH = coconutBowl.height * GLOBAL_SCALE * 0.2;
+
+  let cbX = 650;
+  let cbY = 480;
+
+  let hovering =
+    mouseX > cbX && mouseX < cbX + cbW &&
+    mouseY > cbY && mouseY < cbY + cbH;
+
+  if (hovering) tint(200);
+  image(coconutBowl, cbX, cbY, cbW, cbH);
+  tint(255);
+}
+
+
+function drawCoffeeButton() {
+  if (gameState !== "kitchen") return;
+
+  let cbW = coffeeButton.width * GLOBAL_SCALE * 0.1;
+  let cbH = coffeeButton.height * GLOBAL_SCALE * 0.1;
+
+  let cbX = 340;
+  let cbY = 200;
+
+  let hovering =
+    mouseX > cbX && mouseX < cbX + cbW &&
+    mouseY > cbY && mouseY < cbY + cbH;
+
+  if (hovering) tint(200);
+  image(coffeeButton, cbX, cbY, cbW, cbH);
+  tint(255);
+}
+
+
+function drawOrangeJuiceButton() {
+  if (gameState !== "kitchen") return;
+
+  let ojW = orangeJuiceButton.width * GLOBAL_SCALE * 0.1;
+  let ojH = orangeJuiceButton.height * GLOBAL_SCALE * 0.1;
+
+  let ojX = 220;
+  let ojY = 200;
+
+  let hovering =
+    mouseX > ojX && mouseX < ojX + ojW &&
+    mouseY > ojY && mouseY < ojY + ojH;
+
+  if (hovering) tint(200);
+  image(orangeJuiceButton, ojX, ojY, ojW, ojH);
+  tint(255);
+}
+
+
+function drawTeaButton() {
+  if (gameState !== "kitchen") return;
+
+  let tW = teaButton.width * GLOBAL_SCALE * 0.1;
+  let tH = teaButton.height * GLOBAL_SCALE * 0.1;
+
+  let tX = 100; 
+  let tY = 200;  
+
+  let hovering =
+    mouseX > tX && mouseX < tX + tW &&
+    mouseY > tY && mouseY < tY + tH;
+
+  if (hovering) tint(200);
+  image(teaButton, tX, tY, tW, tH);
+  tint(255);
+}
+
+
+function drawFinishButton() {
+  if (gameState !== "kitchen") return;
+
+  let fbW = finishButton.width * GLOBAL_SCALE * 0.2;
+  let fbH = finishButton.height * GLOBAL_SCALE * 0.2;
+
+  let fbX = 700;
+  let fbY = 650;
+
+  let hovering =
+    mouseX > fbX && mouseX < fbX + fbW &&
+    mouseY > fbY && mouseY < fbY + fbH;
+
+  if (hovering) tint(200);
+  image(finishButton, fbX, fbY, fbW, fbH);
+  tint(255);
+}
+
+
+function submitOrder() {
+  if (!currentCustomer) return;
+
+  let correctDrink = currentCustomer.order.drink;
+  let correctTopping = currentCustomer.order.topping;
+
+  if (currentDrink === correctDrink && currentTopping === correctTopping) {
+    score += 100;
+    scorePopupText = "+100";
+  } else {
+    score -= 50;
+    scorePopupText = "-50";
+  }
+
+  scorePopupStartTime = millis();
+
+  // reset player state
+  currentDrink = "empty";
+  currentTopping = "none";
+
+  // 关键：直接结束当前顾客逻辑占用
+  currentCustomer.finishOrder();
+  currentCustomer = null;   // 这一行是关键
+}
+
+
+function drawScorePopup() {
+  if (scorePopupText === "") return;
+
+  let elapsed = millis() - scorePopupStartTime;
+  if (elapsed > 1000) {
+    scorePopupText = "";
+    return;
+  }
+
+  fill(185, 60, 60); // 红色
+  noStroke();
+  textAlign(RIGHT, TOP);
+  textSize(32);
+  text(scorePopupText, width - 30, 30);
+}
+
 
