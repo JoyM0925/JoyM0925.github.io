@@ -16,9 +16,10 @@ let pulseSpeed = 0.003; //
 let pulseGrowing = true;
 let dayOneBoard;
 let dayOneState = "none";    // none -> showing -> moving -> counting -> ending -> result
-let dayOneTimer = 1;       // 100s countdown
+let dayOneTimer = 100;       // 100s countdown
 let dayOneStartTime = 0;     // record when board first appears
-let currentCustomer = null;
+let hasCustomer = false;
+let currentCustomer;
 let customer1;
 let customer2;
 let customer3;
@@ -228,14 +229,14 @@ function draw() {
     drawScorePopup();
 
 
-    if (dayOneState === "counting" && currentCustomer === null) {
+    if (dayOneState === "counting" && !hasCustomer) {
       spawnCustomer();
-    }
+    }    
     
-    if (currentCustomer) {
+    if (hasCustomer) {
       currentCustomer.update();
       currentCustomer.display();
-    }
+    }    
     
   }
 
@@ -343,8 +344,8 @@ function mousePressed() {
     let rW = restartButton.width * globalscale * 0.3;
     let rH = restartButton.height * globalscale * 0.3;
 
-    let rX = boardX + boardW / 2 - rW / 2;
-    let rY = boardY + boardH * 0.65;
+    let rX = 550;
+    let rY = 450;
 
     if (
       mouseX > rX && mouseX < rX + rW &&
@@ -702,16 +703,18 @@ class customers {
 }
 
 function spawnCustomer() {
-  if (currentCustomer !== null) return;
+  if (hasCustomer) return;
 
   let index = floor(random(customerImgs.length));
+  currentCustomer = new customers(
+    customerImgs[index],
+    orderImgs[index],
+    orders[index]
+  );
 
-  let img = customerImgs[index];
-  let orderImg = orderImgs[index];
-  let orderData = orders[index];
-
-  currentCustomer = new customers(img, orderImg, orderData);
+  hasCustomer = true;
 }
+
 
 
 function drawRightClicker() {
@@ -972,7 +975,7 @@ function submitOrder() {
 
   // 直接结束当前顾客逻辑占用
   currentCustomer.finishOrder();
-  currentCustomer = null;   // 这一行是关键
+  hasCustomer = false;  // 这一行是关键
 }
 
 
@@ -1040,7 +1043,8 @@ function restartGame() {
 
   // gameplay
   score = 0;
-  currentCustomer = null;
+  hasCustomer = false;
+
 
   // visuals
   pulseScale = 1;
