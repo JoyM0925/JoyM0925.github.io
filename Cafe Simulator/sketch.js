@@ -231,12 +231,14 @@ function draw() {
 
     if (dayOneState === "counting" && !hasCustomer) {
       spawnCustomer();
-    }    
+    }
+    
     
     if (hasCustomer) {
       currentCustomer.update();
       currentCustomer.display();
-    }    
+    }
+    
     
   }
 
@@ -327,10 +329,7 @@ function mousePressed() {
     let bcX = 725;
     let bcY = 400;
 
-    if (
-      mouseX > bcX && mouseX < bcX + bcW &&
-      mouseY > bcY && mouseY < bcY + bcH
-    ) {
+    if (mouseX > bcX && mouseX < bcX + bcW && mouseY > bcY && mouseY < bcY + bcH) {
       showBoardClicker = false;
       showResultText = true;
       return;
@@ -338,7 +337,7 @@ function mousePressed() {
   }
 
 
-  // 点击 restart
+  // click restart
   if (dayOneState === "result" && showResultText) {
 
     let rW = restartButton.width * globalscale * 0.3;
@@ -347,10 +346,7 @@ function mousePressed() {
     let rX = 550;
     let rY = 450;
 
-    if (
-      mouseX > rX && mouseX < rX + rW &&
-      mouseY > rY && mouseY < rY + rH
-    ) {
+    if (mouseX > rX && mouseX < rX + rW && mouseY > rY && mouseY < rY + rH) {
       restartGame();
       return;
     }
@@ -432,10 +428,7 @@ function mousePressed() {
     // red bean topping
     let rbW = redBeanBowl.width * globalscale * 0.2;
     let rbH = redBeanBowl.height * globalscale * 0.2;
-    if (
-      mouseX > 570 && mouseX < 570 + rbW &&
-      mouseY > 300 && mouseY < 300 + rbH
-    ) {
+    if (mouseX > 570 && mouseX < 570 + rbW && mouseY > 300 && mouseY < 300 + rbH) {
       currentTopping = "redbean";
       return;
     }
@@ -443,10 +436,7 @@ function mousePressed() {
     // boba topping
     let bbW = blackBobaBowl.width * globalscale * 0.2;
     let bbH = blackBobaBowl.height * globalscale * 0.2;
-    if (
-      mouseX > 850 && mouseX < 850 + bbW &&
-      mouseY > 300 && mouseY < 300 + bbH
-    ) {
+    if (mouseX > 850 && mouseX < 850 + bbW && mouseY > 300 && mouseY < 300 + bbH) {
       currentTopping = "boba";
       return;
     }
@@ -454,10 +444,7 @@ function mousePressed() {
     // coconut jelly topping
     let cbW = coconutBowl.width * globalscale * 0.2;
     let cbH = coconutBowl.height * globalscale * 0.2;
-    if (
-      mouseX > 650 && mouseX < 650 + cbW &&
-      mouseY > 480 && mouseY < 480 + cbH
-    ) {
+    if (mouseX > 650 && mouseX < 650 + cbW && mouseY > 480 && mouseY < 480 + cbH) {
       currentTopping = "coconut";
       return;
     }
@@ -468,10 +455,7 @@ function mousePressed() {
     let fbX = 700;
     let fbY = 650;
 
-    if (
-      mouseX > fbX && mouseX < fbX + fbW &&
-      mouseY > fbY && mouseY < fbY + fbH
-    ) {
+    if (mouseX > fbX && mouseX < fbX + fbW && mouseY > fbY && mouseY < fbY + fbH) {
       submitOrder();
       return;
     }
@@ -487,7 +471,9 @@ function mouseInCancel() {
 
 function drawDayOneBoard() {
 
-  if (dayOneState === "none") return;
+  if (dayOneState === "none") {
+    return;
+  }
 
   if (dayOneState === "showing") {
 
@@ -509,7 +495,7 @@ function drawDayOneBoard() {
 
     let elapsed = millis() - dayOneStartTime;
     if (elapsed > 2000) {
-        dayOneState = "moving";
+      dayOneState = "moving";
     }
     return;
   } 
@@ -528,8 +514,8 @@ function drawDayOneBoard() {
     // when close enough -> start countdown
     let d = dist(boardX, boardY, targetX, targetY);
     if (d < 10) {                
-        dayOneState = "counting";
-        dayOneStartTime = millis();
+      dayOneState = "counting";
+      dayOneStartTime = millis();
     }
 
     return;
@@ -558,15 +544,16 @@ function drawDayOneBoard() {
     let textY = boardY + boardH  - 115;
 
     text(remaining + "s", textX, textY);
-    // 倒计时结束
+    // countdown stopped
     if (remaining === 0) {
 
       dayOneState = "ending";
 
-      // 停止所有客人
-      currentCustomer = null;
+      // stop all the customer
+      hasCustomer = false;
 
-      // 设置“放大回中心”的目标
+
+      // set the target to get the larger board
       targetW = dayOneBoard.width * globalscale;
       targetH = dayOneBoard.height * globalscale;
       targetX = (width - targetW) / 2;
@@ -577,7 +564,7 @@ function drawDayOneBoard() {
 
   if (dayOneState === "ending") {
 
-    // 板子放大 + 回到中心
+    // board getting larger 
     boardX = lerp(boardX, targetX, 0.06);
     boardY = lerp(boardY, targetY, 0.06);
     boardW = lerp(boardW, targetW, 0.06);
@@ -585,7 +572,7 @@ function drawDayOneBoard() {
   
     image(dayOneBoard, boardX, boardY, boardW, boardH);
   
-    // 接近目标后，进入结果展示
+    // result showing
     let d = dist(boardX, boardY, targetX, targetY);
     if (d < 8) {
       dayOneState = "result";
@@ -604,7 +591,7 @@ function drawDayOneBoard() {
     noStroke();
   
     if (!showResultText) {
-      // 阶段一：显示 SCORE
+      // show the score
       fill(0);
       textSize(boardH * 0.18);
       text("SCORE", boardX + boardW / 2, boardY + boardH * 0.42);
@@ -614,7 +601,7 @@ function drawDayOneBoard() {
       text(score, boardX + boardW / 2, boardY + boardH * 0.58);
     } 
     else {
-      // 阶段二：PASS / FAIL
+      // pass or fail
       fill(0);
       textSize(boardH * 0.2);
   
@@ -703,8 +690,9 @@ class customers {
 }
 
 function spawnCustomer() {
-  if (hasCustomer) return;
-
+  if (hasCustomer) {
+    return;
+  }
   let index = floor(random(customerImgs.length));
   currentCustomer = new customers(
     customerImgs[index],
@@ -718,30 +706,36 @@ function spawnCustomer() {
 
 
 function drawRightClicker() {
-  if (dayOneState === "none") return;
-  if (gameState !== "orderPage") return;
-
+  if (dayOneState === "none") {
+    return;
+  }
+  if (gameState !== "orderPage") {
+    return;
+  }
   rcW = 140;
   rcH = 140;
 
   rcX = 960;
   rcY = height/2;
 
-  let hovering = mouseX > rcX && mouseX < rcX + rcW &&
-                 mouseY > rcY && mouseY < rcY + rcH;
+  let hovering = mouseX > rcX && mouseX < rcX + rcW && mouseY > rcY && mouseY < rcY + rcH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
+
   image(rightClicker, rcX, rcY, rcW, rcH);
   tint(255);
 }
 
 function mouseInRightClicker() {
-  return mouseX > rcX && mouseX < rcX + rcW &&
-         mouseY > rcY && mouseY < rcY + rcH;
+  return mouseX > rcX && mouseX < rcX + rcW && mouseY > rcY && mouseY < rcY + rcH;
 }
 
 function drawLeftClicker() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   lcW = 140;
   lcH = 140;
@@ -749,21 +743,23 @@ function drawLeftClicker() {
   lcX = 10;
   lcY = height/2;
 
-  let hovering = mouseX > lcX && mouseX < lcX + lcW &&
-                 mouseY > lcY && mouseY < lcY + lcH;
+  let hovering = mouseX > lcX && mouseX < lcX + lcW && mouseY > lcY && mouseY < lcY + lcH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
   image(leftClicker, lcX, lcY, lcW, lcH);
   tint(255);
 }
 
 function mouseInLeftClicker() {
-  return mouseX > lcX && mouseX < lcX + lcW &&
-         mouseY > lcY && mouseY < lcY + lcH;
+  return mouseX > lcX && mouseX < lcX + lcW && mouseY > lcY && mouseY < lcY + lcH;
 }
 
 function drawLiquidMachine() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   let lmW = liquidMachine.width * globalscale * 0.5
   let lmH = liquidMachine.height * globalscale * 0.5;
@@ -775,7 +771,9 @@ function drawLiquidMachine() {
 }
 
 function drawPlaceCup() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   // cup size  
   let pcW = placeCup.width * globalscale * 0.35;
@@ -789,9 +787,15 @@ function drawPlaceCup() {
 
   // choose drink image
   let img = emptyGlass;
-  if (currentDrink === "coffee") img = coffeeDrink;
-  else if (currentDrink === "orange") img = orangeDrink;
-  else if (currentDrink === "tea") img = teaDrink;
+  if (currentDrink === "coffee") {
+    img = coffeeDrink;
+  }
+  else if (currentDrink === "orange") {
+    img = orangeDrink;
+  }
+  else if (currentDrink === "tea") {
+    img = teaDrink;
+  }
 
   let dX = 200
   let dY = 400
@@ -802,10 +806,15 @@ function drawPlaceCup() {
 
   // draw topping ABOVE drink
   let toppingImg = null;
-  if (currentTopping === "redbean") toppingImg = redBeanTopping;
-  else if (currentTopping === "coconut") toppingImg = coconutJellyTopping;
-  else if (currentTopping === "boba") toppingImg = bobaTopping;
-
+  if (currentTopping === "redbean") {
+    toppingImg = redBeanTopping;
+  }
+  else if (currentTopping === "coconut") {
+    toppingImg = coconutJellyTopping;
+  }
+  else if (currentTopping === "boba") {
+    toppingImg = bobaTopping;
+  }
   if (toppingImg) {
     let tW = toppingImg.width * globalscale * 0.08;
     let tH = toppingImg.height * globalscale * 0.08;
@@ -820,7 +829,9 @@ function drawPlaceCup() {
 
 
 function drawRedBeanBowl() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   let rbW = redBeanBowl.width * globalscale * 0.2;
   let rbH = redBeanBowl.height * globalscale * 0.2;
@@ -828,18 +839,20 @@ function drawRedBeanBowl() {
   let rbX = 570;
   let rbY = 300;
 
-  let hovering =
-    mouseX > rbX && mouseX < rbX + rbW &&
-    mouseY > rbY && mouseY < rbY + rbH;
+  let hovering = mouseX > rbX && mouseX < rbX + rbW && mouseY > rbY && mouseY < rbY + rbH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
   image(redBeanBowl, rbX, rbY, rbW, rbH);
   tint(255);
 }
 
 
 function drawBlackBobaBowl() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   let bbW = blackBobaBowl.width * globalscale * 0.2;
   let bbH = blackBobaBowl.height * globalscale * 0.2;
@@ -847,37 +860,41 @@ function drawBlackBobaBowl() {
   let bbX = 850;
   let bbY = 300;
 
-  let hovering =
-    mouseX > bbX && mouseX < bbX + bbW &&
-    mouseY > bbY && mouseY < bbY + bbH;
+  let hovering = mouseX > bbX && mouseX < bbX + bbW && mouseY > bbY && mouseY < bbY + bbH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
   image(blackBobaBowl, bbX, bbY, bbW, bbH);
   tint(255);
 }
 
 
 function drawCoconutBowl() {
-  if (gameState !== "kitchen") return;
-
+  if (gameState !== "kitchen") {
+    return;
+  }
+  
   let cbW = coconutBowl.width * globalscale * 0.2;
   let cbH = coconutBowl.height * globalscale * 0.2;
 
   let cbX = 650;
   let cbY = 480;
 
-  let hovering =
-    mouseX > cbX && mouseX < cbX + cbW &&
-    mouseY > cbY && mouseY < cbY + cbH;
+  let hovering = mouseX > cbX && mouseX < cbX + cbW && mouseY > cbY && mouseY < cbY + cbH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
   image(coconutBowl, cbX, cbY, cbW, cbH);
   tint(255);
 }
 
 
 function drawCoffeeButton() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   let cbW = coffeeButton.width * globalscale * 0.1;
   let cbH = coffeeButton.height * globalscale * 0.1;
@@ -885,18 +902,20 @@ function drawCoffeeButton() {
   let cbX = 340;
   let cbY = 200;
 
-  let hovering =
-    mouseX > cbX && mouseX < cbX + cbW &&
-    mouseY > cbY && mouseY < cbY + cbH;
+  let hovering = mouseX > cbX && mouseX < cbX + cbW && mouseY > cbY && mouseY < cbY + cbH;
 
-  if (hovering) tint(200);
+  if (hovering) {
+    tint(200);
+  }
   image(coffeeButton, cbX, cbY, cbW, cbH);
   tint(255);
 }
 
 
 function drawOrangeJuiceButton() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   let ojW = orangeJuiceButton.width * globalscale * 0.1;
   let ojH = orangeJuiceButton.height * globalscale * 0.1;
@@ -904,18 +923,20 @@ function drawOrangeJuiceButton() {
   let ojX = 220;
   let ojY = 200;
 
-  let hovering =
-    mouseX > ojX && mouseX < ojX + ojW &&
-    mouseY > ojY && mouseY < ojY + ojH;
+  let hovering = mouseX > ojX && mouseX < ojX + ojW && mouseY > ojY && mouseY < ojY + ojH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
   image(orangeJuiceButton, ojX, ojY, ojW, ojH);
   tint(255);
 }
 
 
 function drawTeaButton() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   let tW = teaButton.width * globalscale * 0.1;
   let tH = teaButton.height * globalscale * 0.1;
@@ -923,18 +944,20 @@ function drawTeaButton() {
   let tX = 100; 
   let tY = 200;  
 
-  let hovering =
-    mouseX > tX && mouseX < tX + tW &&
-    mouseY > tY && mouseY < tY + tH;
+  let hovering = mouseX > tX && mouseX < tX + tW && mouseY > tY && mouseY < tY + tH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
   image(teaButton, tX, tY, tW, tH);
   tint(255);
 }
 
 
 function drawFinishButton() {
-  if (gameState !== "kitchen") return;
+  if (gameState !== "kitchen") {
+    return;
+  }
 
   let fbW = finishButton.width * globalscale * 0.2;
   let fbH = finishButton.height * globalscale * 0.2;
@@ -942,18 +965,20 @@ function drawFinishButton() {
   let fbX = 700;
   let fbY = 650;
 
-  let hovering =
-    mouseX > fbX && mouseX < fbX + fbW &&
-    mouseY > fbY && mouseY < fbY + fbH;
+  let hovering = mouseX > fbX && mouseX < fbX + fbW && mouseY > fbY && mouseY < fbY + fbH;
 
-  if (hovering) tint(200);
+  if (hovering){
+    tint(200);
+  } 
   image(finishButton, fbX, fbY, fbW, fbH);
   tint(255);
 }
 
 
 function submitOrder() {
-  if (!currentCustomer) return;
+  if (!currentCustomer){
+    return;
+  }
 
   let correctDrink = currentCustomer.order.drink;
   let correctTopping = currentCustomer.order.topping;
@@ -973,16 +998,18 @@ function submitOrder() {
   currentDrink = "empty";
   currentTopping = "none";
 
-  // 直接结束当前顾客逻辑占用
-  currentCustomer.finishOrder();
-  hasCustomer = false;  // 这一行是关键
+  // stop customer
+  hasCustomer = false; 
 }
 
 
 function drawScorePopup() {
-  if (scorePopupText === "") return;
+  if (scorePopupText === "") {
+    return;
+  }
 
   let elapsed = millis() - scorePopupStartTime;
+
   if (elapsed > 1000) {
     scorePopupText = "";
     return;
@@ -1003,11 +1030,11 @@ function drawBoardClicker() {
   let bcX = 725;
   let bcY = 400;
 
-  let hovering =
-    mouseX > bcX && mouseX < bcX + bcW &&
-    mouseY > bcY && mouseY < bcY + bcH;
+  let hovering = mouseX > bcX && mouseX < bcX + bcW &&  mouseY > bcY && mouseY < bcY + bcH;
 
-  if (hovering) tint(200);
+  if (hovering) {
+    tint(200);
+  }
   image(boardClicker, bcX, bcY, bcW, bcH);
   tint(255);
 }
@@ -1021,11 +1048,11 @@ function drawRestartButton() {
   let rX = 550;
   let rY = 450;
 
-  let hovering =
-    mouseX > rX && mouseX < rX + rW &&
-    mouseY > rY && mouseY < rY + rH;
+  let hovering = mouseX > rX && mouseX < rX + rW && mouseY > rY && mouseY < rY + rH;
 
-  if (hovering) tint(200);
+  if (hovering) {
+    tint(200);
+  }
   image(restartButton, rX, rY, rW, rH);
   tint(255);
 }
