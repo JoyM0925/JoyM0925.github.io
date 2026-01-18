@@ -2,22 +2,22 @@
 // Joy M
 // Dec 4, 2025
 
-let globalscale = 0.18//make the canva stay in a fixed scale no matter what the scale of the window is
+let globalscale = 0.18 //make the canva stay in a fixed scale no matter what the scale of the window is
 let startImage;
 let blurImage;
 let tutorialBoard;
 let tutorialBoard2;
 let tutorialBoard3;
-let cancelButton;     // only button now
+let cancelButton; 
 let cafeOrderPage;
 let pressToContinueImg;  
 let pulseScale = 1;
 let pulseSpeed = 0.003; // 
 let pulseGrowing = true;
 let dayOneBoard;
-let dayOneState = "none";    // none -> showing -> moving -> counting -> ending -> result
-let dayOneTimer = 100;       // 100s countdown
-let dayOneStartTime = 0;     // record when board first appears
+let dayOneState = "none"; // none -> showing -> moving -> counting -> ending -> result
+let dayOneTimer = 100; // 100s countdown
+let dayOneStartTime = 0; // record when board first appears
 let hasCustomer = false;
 let currentCustomer;
 let customer1;
@@ -55,17 +55,20 @@ let order5;
 
 let orderImgs = [];
 
+// order format: [drink, topping]
 let orders = [
-  { drink: "tea",    topping: "redbean" },   // C1 catmush
-  { drink: "orange", topping: "boba" }, // C2 bearmush
-  { drink: "coffee", topping: "coconut" }, // C3 kidmush
-  { drink: "tea",    topping: "boba" }, // C4 witchmush
-  { drink: "orange", topping: "coconut" }  // C5 pigmush
+  ["tea", "redbean"],     // C1 catmush
+  ["orange", "boba"],     // C2 bearmush
+  ["coffee", "coconut"], // C3 kidmush
+  ["tea", "boba"],       // C4 witchmush
+  ["orange", "coconut"]  // C5 pigmush
 ];
+
 
 let score = 0;
 let scorePopupText = "";
-let scorePopupStartTime = 0;
+let scorePopupFrames = 0;
+
 
 let boardClicker;
 let restartButton;
@@ -73,28 +76,15 @@ let restartButton;
 let showBoardClicker = false;
 let showResultText = false;
 
-
-
-// left clicker button area
-let lcX, lcY, lcW, lcH;
-
-
-// right clicker button area
-let rcX, rcY, rcW, rcH;
-
-
-// board animation values
-let boardX, boardY;
-let boardW, boardH;
-
-// for countdown board
-let targetX, targetY;        // final small position (top-right)
-let targetW, targetH;        // final small size (scaled)
-
 let gameState = "start"; // start -> tutorial -> tutorial2 -> tutorial3 -> orderPage -> kitchen
 
-// check the area of cancel button
-let cancelX, cancelY, cancelW, cancelH;
+
+// AREA CHECKING PART
+let lcX, lcY, lcW, lcH; // left clicker button area
+let rcX, rcY, rcW, rcH; // right clicker button area
+let boardX, boardY, boardW, boardH; // board animation values
+let targetX, targetY, targetW, targetH; // for countdown board
+let cancelX, cancelY, cancelW, cancelH; // check the area of cancel button
 
 async function loadAssets() {
   startImage = await loadImage("assets/startscreen.png");
@@ -130,7 +120,7 @@ async function loadAssets() {
 
 
 
-  // order
+  // ORDER PART
   order1 = await loadImage("assets/c1order.png");
   order2 = await loadImage("assets/c2order.png");
   order3 = await loadImage("assets/c3order.png");
@@ -146,14 +136,13 @@ async function loadAssets() {
   ];
 
 
-  // customers 
+  // CUSTOMER PART'
   customer1 = await loadImage("assets/c1.png");
   customer2 = await loadImage("assets/c2.png");
   customer3 = await loadImage("assets/c3.png");
   customer4 = await loadImage("assets/c4.png");
   customer5 = await loadImage("assets/c5.png");
 
-  // collect
   customerImgs = [
     customer1,
     customer2,
@@ -204,6 +193,7 @@ function draw() {
     }
   }
 
+  // tutorial part
   else if (gameState === "tutorial") {
     drawTutorialPage(tutorialBoard);
   }
@@ -216,6 +206,7 @@ function draw() {
     drawTutorialPage(tutorialBoard3);
   }
 
+  // order page
   else if (gameState === "orderPage") {
 
     // draw the cafe background
@@ -232,12 +223,14 @@ function draw() {
     if (dayOneState === "counting" && !hasCustomer) {
       spawnCustomer();
     }
+  
     
-    
-    if (hasCustomer) {
+    // customer appear
+    if (hasCustomer && currentCustomer.state !== "done") {
       currentCustomer.update();
       currentCustomer.display();
     }
+    
     
     
   }
@@ -259,7 +252,6 @@ function draw() {
     drawCoconutBowl(); 
     drawFinishButton();
     drawPlaceCup(); 
-    // still show the right clicker so you can go back
     drawLeftClicker();
     drawScorePopup();
 
@@ -269,7 +261,7 @@ function draw() {
 
 function drawTutorialPage(boardImg) {
 
-  // background (fixed scale)
+  // background for turorial
   let bW = blurImage.width * globalscale;
   let bH = blurImage.height * globalscale;
   image(blurImage, (width - bW) / 2, (height - bH) / 2, bW, bH);
@@ -277,7 +269,6 @@ function drawTutorialPage(boardImg) {
   // board scale
   let displayW = boardImg.width * globalscale;
   let displayH = boardImg.height * globalscale;
-
   let x = (width - displayW) / 2;
   let y = (height - displayH) / 2; 
 
@@ -287,14 +278,13 @@ function drawTutorialPage(boardImg) {
   // cancel button 
   cancelW = 110;
   cancelH = 90;
-
   cancelX = x + displayW - cancelW - 1020;
   cancelY = y + 80;
 
   let hoveringCancel = mouseX > cancelX && mouseX < cancelX + cancelW && mouseY > cancelY && mouseY < cancelY + cancelH;
 
   if (hoveringCancel) {
-    tint(200);
+    tint(200); // learnt tint from p5js, a transparant cover layer to make the buttons look like being pressed down
   }
   image(cancelButton, cancelX, cancelY, cancelW, cancelH);
 
@@ -320,12 +310,11 @@ function keyPressed() {
 
 // cancel (exit tutorial) 
 function mousePressed() {
-  // board clicker 点击
+  // board clicker click
   if (dayOneState === "result" && showBoardClicker) {
 
     let bcW = boardClicker.width * globalscale * 0.25;
     let bcH = boardClicker.height * globalscale * 0.25;
-
     let bcX = 725;
     let bcY = 400;
 
@@ -367,10 +356,10 @@ function mousePressed() {
   }
 
 
-  if (mouseInCancel()&& (gameState === "tutorial" || gameState === "tutorial2" || gameState === "tutorial3")) {
+  if (mouseInCancel()&& (gameState === "tutorial" || gameState === "tutorial2" || gameState === "tutorial3")) { // you can canel the tutorial whenever you want
     gameState = "orderPage";
     dayOneState = "showing";
-    dayOneStartTime = millis();
+    dayOneStartTime = millis(); // start to count down
   
     //  full scale
     boardW = dayOneBoard.width * globalscale;
@@ -503,8 +492,8 @@ function drawDayOneBoard() {
   // shrinking + moving to top-right 
   if (dayOneState === "moving") {
 
-    // lerp movement from p5
-    boardX = lerp(boardX, targetX, 0.05); // lerp is Calculates a number between two numbers at a specific increment.(from p5 reference)
+    // lerp movement learnt rom p5js
+    boardX = lerp(boardX, targetX, 0.05); // lerp is calculates a number between two numbers at a specific increment.(from p5 reference)
     boardY = lerp(boardY, targetY , 0.05);
     boardW = lerp(boardW, targetW, 0.05);
     boardH = lerp(boardH, targetH, 0.05);
@@ -526,8 +515,11 @@ function drawDayOneBoard() {
     image(dayOneBoard, boardX, boardY, boardW, boardH);
 
     // countdown
-    let elapsed = floor((millis() - dayOneStartTime) / 1000);
-    let remaining = max(0, dayOneTimer - elapsed);
+    let elapsed = floor((millis() - dayOneStartTime) / 1000); // mills -> learnt from p5js and floor() leanrt from chatgpt to improve the logic of countdown, or the number of countdown gonna change once per frame
+    let remaining = dayOneTimer - elapsed;
+    if (remaining < 0) {
+      remaining = 0;
+    }; // make sure the coundown never go bwlow 0
 
     // color change for last 20 seconds
     if (remaining <= 20) {
@@ -573,8 +565,8 @@ function drawDayOneBoard() {
     image(dayOneBoard, boardX, boardY, boardW, boardH);
   
     // result showing
-    let d = dist(boardX, boardY, targetX, targetY);
-    if (d < 8) {
+    let d = dist(boardX, boardY, targetX, targetY);// dist learnt from p5js; find the distance from the orginal location and the target place
+    if (d < 8) { // when the distance < 8, showing the result
       dayOneState = "result";
       showBoardClicker = true;
     }
@@ -641,7 +633,7 @@ class customers {
     this.x = width + this.w;
     this.y = height / 2 - 40;
 
-    // mid point
+    // mid point of the screen
     this.targetX = width / 2 + 180;
 
     this.speed = 6;
@@ -651,7 +643,7 @@ class customers {
 
   update() {
     if (this.state === "entering") {
-      this.x -= this.speed;
+      this.x -= this.speed; // steadly entering the screen
       if (this.x <= this.targetX) {
         this.x = this.targetX;
         this.state = "waiting";
@@ -661,7 +653,8 @@ class customers {
     else if (this.state === "leaving") {
       this.x += this.speed;
       if (this.x > width + this.w) {
-        currentCustomer = null; // when one finish the next appear
+        this.state = "done";
+        hasCustomer = false; // dispear from the screen, the customer state became false and ready for the next customer
       }
     }
   }
@@ -687,18 +680,37 @@ class customers {
   finishOrder() {
     this.state = "leaving";
   }
+
 }
 
 function spawnCustomer() {
-  if (hasCustomer) {
+  if (hasCustomer) { // check if has customer to aviod crashing
     return;
   }
-  let index = floor(random(customerImgs.length));
+
+  let r = random(100); // 0 -> 100
+  let index;
+  if (r < 20) { // c1
+    index = 0;   
+  }
+  else if (r < 40) { // c2
+    index = 1;
+  }
+  else if (r < 60) { // c3
+    index = 2;
+  }
+  else if (r < 80) { // c4
+    index = 3;
+  }
+  else { // c5
+    index = 4;
+  }
+
   currentCustomer = new customers(
     customerImgs[index],
     orderImgs[index],
     orders[index]
-  );
+  ); // fix order and order image for one customer
 
   hasCustomer = true;
 }
@@ -706,10 +718,10 @@ function spawnCustomer() {
 
 
 function drawRightClicker() {
-  if (dayOneState === "none") {
+  if (dayOneState === "none") { // check thr state of which screen to aviod crashing
     return;
   }
-  if (gameState !== "orderPage") {
+  if (gameState !== "orderPage") { // crashed once, and teh right clicker appeared on kitche page
     return;
   }
   rcW = 140;
@@ -733,7 +745,7 @@ function mouseInRightClicker() {
 }
 
 function drawLeftClicker() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // check if kitchen to aviod crashing
     return;
   }
 
@@ -757,7 +769,7 @@ function mouseInLeftClicker() {
 }
 
 function drawLiquidMachine() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // has to be kitchen
     return;
   }
 
@@ -771,7 +783,7 @@ function drawLiquidMachine() {
 }
 
 function drawPlaceCup() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
 
@@ -805,31 +817,31 @@ function drawPlaceCup() {
   image(img, dX, dY, dW, dH);
 
   // draw topping ABOVE drink
-  let toppingImg = null;
-  if (currentTopping === "redbean") {
-    toppingImg = redBeanTopping;
-  }
-  else if (currentTopping === "coconut") {
-    toppingImg = coconutJellyTopping;
-  }
-  else if (currentTopping === "boba") {
-    toppingImg = bobaTopping;
-  }
-  if (toppingImg) {
+  let toppingImg;
+
+  if (currentTopping !== "none") {
+    if (currentTopping === "redbean") {
+      toppingImg = redBeanTopping;
+    }
+    else if (currentTopping === "coconut") {
+      toppingImg = coconutJellyTopping;
+    }
+    else if (currentTopping === "boba") {
+      toppingImg = bobaTopping;
+    }
+
     let tW = toppingImg.width * globalscale * 0.08;
     let tH = toppingImg.height * globalscale * 0.08;
 
-    let tX = 235;
-    let tY = 530;
-
-    image(toppingImg, tX, tY, tW, tH);
+    image(toppingImg, 235, 530, tW, tH);
   }
+
 
 }
 
 
 function drawRedBeanBowl() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
 
@@ -850,7 +862,7 @@ function drawRedBeanBowl() {
 
 
 function drawBlackBobaBowl() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
 
@@ -871,7 +883,7 @@ function drawBlackBobaBowl() {
 
 
 function drawCoconutBowl() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
   
@@ -892,7 +904,7 @@ function drawCoconutBowl() {
 
 
 function drawCoffeeButton() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
 
@@ -913,7 +925,7 @@ function drawCoffeeButton() {
 
 
 function drawOrangeJuiceButton() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
 
@@ -934,7 +946,7 @@ function drawOrangeJuiceButton() {
 
 
 function drawTeaButton() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
 
@@ -955,7 +967,7 @@ function drawTeaButton() {
 
 
 function drawFinishButton() {
-  if (gameState !== "kitchen") {
+  if (gameState !== "kitchen") { // only appear on ktchen page
     return;
   }
 
@@ -976,23 +988,26 @@ function drawFinishButton() {
 
 
 function submitOrder() {
-  if (!currentCustomer){
+  if (!currentCustomer){ // only appear on ktchen page
     return;
   }
 
-  let correctDrink = currentCustomer.order.drink;
-  let correctTopping = currentCustomer.order.topping;
+  // order[0] = drink, order[1] = topping
+  let correctDrink = currentCustomer.order[0];
+  let correctTopping = currentCustomer.order[1];
 
-  if (currentDrink === correctDrink && currentTopping === correctTopping) {
+
+  if (currentDrink === correctDrink && currentTopping === correctTopping) { // correct order + 100
     score += 100;
     scorePopupText = "+100";
   } 
-  else {
+  else { // incorrect order -50
     score -= 50;
     scorePopupText = "-50";
   }
 
-  scorePopupStartTime = millis();
+  scorePopupFrames = 60; // show for about 1 second
+
 
   // reset player state
   currentDrink = "empty";
@@ -1000,26 +1015,28 @@ function submitOrder() {
 
   // stop customer
   hasCustomer = false; 
+
+  // my friends' advice -> go back to order page automatically after subbmiting the order
+  gameState = "orderPage";
+
 }
 
 
 function drawScorePopup() {
-  if (scorePopupText === "") {
+  if (scorePopupText === "") { // only appear on ktchen page
+    return;
+  } 
+
+  if (scorePopupFrames <= 0) {
     return;
   }
-
-  let elapsed = millis() - scorePopupStartTime;
-
-  if (elapsed > 1000) {
-    scorePopupText = "";
-    return;
-  }
-
-  fill(185, 60, 60); // 红色
-  noStroke();
-  textAlign(RIGHT, TOP);
+  
+  scorePopupFrames-- ; // only appear one ssecond, so -- in every frame in evry draw action
+  
+  fill(185, 60, 60);
   textSize(32);
-  text(scorePopupText, width - 30, 30);
+  text(scorePopupText, width - 50, 30);
+  
 }
 
 function drawBoardClicker() {
