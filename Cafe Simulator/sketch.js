@@ -57,11 +57,11 @@ let orderImgs = [];
 
 // order format: [drink, topping]
 let orders = [
-  ["tea", "redbean"],     // C1 catmush
-  ["orange", "boba"],     // C2 bearmush
+  ["tea", "redbean"], // C1 catmush
+  ["orange", "boba"], // C2 bearmush
   ["coffee", "coconut"], // C3 kidmush
-  ["tea", "boba"],       // C4 witchmush
-  ["orange", "coconut"]  // C5 pigmush
+  ["tea", "boba"], // C4 witchmush
+  ["orange", "coconut"] // C5 pigmush
 ];
 
 
